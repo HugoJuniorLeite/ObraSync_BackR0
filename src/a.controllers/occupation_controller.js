@@ -45,7 +45,7 @@ async function update_occupation_by_id(req, res) {
     const data = req.body
     const occupation_id = req.params.occupation_id;
 
-console.log(occupation_id, "project_id", req.body, "data", data);
+
 
     try {
         await occupation_service.update_occupation(data, occupation_id)

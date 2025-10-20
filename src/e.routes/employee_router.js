@@ -9,5 +9,6 @@ employee_router.post("/add-employee",validateBody(employee_schema),employee_cont
 employee_router.get("/get-employee-by-project/:project_id", employee_controller.find_employee_by_project_controller);
 employee_router.put("/alter-employee/:employee_id", employee_controller.update_employee_controller);
 employee_router.put("/deactivate-employee/:employee_id", employee_controller.delete_employee);
+employee_router.get("/all-employees", employee_controller.get_all_employees_controller);
 
 export default employee_router;

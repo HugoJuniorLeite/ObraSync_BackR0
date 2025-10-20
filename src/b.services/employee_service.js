@@ -30,6 +30,15 @@ const new_employee = await employee_repository.create_employee(data)
         throw error
     }
 }
+async function get_all_employees_service() {
+    try {
+        const all_employees = await employee_repository.get_all_employees();
+        return all_employees;
+    } catch (error) {
+        throw error;
+        
+    }
+}
 
 async function find_employee_by_project_service(project_id) {
     try {
@@ -81,7 +90,7 @@ throw new Error ("Funcionário não encontrado")
 }
 
 const employee_service = {
-    register_employee, find_employee_by_project_service, delete_employee,update_employee
+    register_employee, find_employee_by_project_service, delete_employee,update_employee, get_all_employees_service
 }
 
 export default employee_service;

@@ -37,7 +37,7 @@ async function get_occupation_by_id_service(occupation_id) {
         if (!occupation_by_id || occupation_by_id === null) {
             throw new Error("Nenhum cargo com esse Id");
          }
-         console.log(occupation_by_id);
+      
          
          return occupation_by_id;
 
@@ -47,7 +47,7 @@ async function get_occupation_by_id_service(occupation_id) {
 }
 
 async function update_occupation(data, occupation_id) {
-    console.log(occupation_id, data, "service");
+  
     
       try {
         const selected_occuṕation = await occupation_repository.get_occupation_by_id(occupation_id);

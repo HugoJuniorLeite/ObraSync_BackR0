@@ -149,7 +149,7 @@ async function bill_filtered(status, project_id, technical_id) {
 }
 
 async function get_technical_by_occupation_id(project_id, occupation_ids) {
-  console.log(occupation_ids, project_id, "occupation_ids");
+ 
 
   try {
     return await prisma.employee.findMany({

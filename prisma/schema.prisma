@@ -39,6 +39,7 @@ model occupation {
   total_salary              Float
   employees                 employee[]
   services                  occupation_service[]
+ 
 }
 
 model service {
@@ -134,7 +135,7 @@ model project_team {
   active      Boolean  @default(true)
   employee    employee @relation(fields: [employee_id], references: [id])
   project     project  @relation(fields: [project_id], references: [id])
-
+ 
   @@map("project_team")
 }
 

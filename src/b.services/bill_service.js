@@ -70,7 +70,7 @@ async function get_all_technicals(project_id) {
       all_occupation_ids.map(occupation => occupation.occupation_id)
     )];
 
-    console.log(occupation_ids, "ids");
+   
 
     if (occupation_ids.length === 0) {
       return []; 
