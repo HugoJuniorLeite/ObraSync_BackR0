@@ -206,178 +206,353 @@ where: {project_id: Number(project_id), active: true},
 //   });
 // }
 
-async function updateEmployeeWithRelations(employee_id, data) {
-  console.log(data.cnh.create, "repository");
-try {
+// async function updateEmployeeWithRelations(employee_id, data) {
+//   console.log(data.cnh.create, "repository");
+// try {
   
-  // 🔹 Atualiza os dados principais do funcionário
-  const updatedEmployee = await prisma.employee.update({
-    where: { id: Number(employee_id) },
-    data: {
-      name: data.name ?? undefined,
-      date_of_birth: data.date_of_birth ? new Date(data.date_of_birth) : undefined,
-      rg: data.rg ?? undefined,
-      cpf: data.cpf ?? undefined,
-      drivers_license: data.drivers_license ?? undefined,
-      occupation_id: data.occupation_id ?? undefined,
-      admission_date: data.admission_date ? new Date(data.admission_date) : undefined,
-    },
-  });
+//   // 🔹 Atualiza os dados principais do funcionário
+//   const updatedEmployee = await prisma.employee.update({
+//     where: { id: Number(employee_id) },
+//     data: {
+//       name: data.name ?? undefined,
+//       date_of_birth: data.date_of_birth ? new Date(data.date_of_birth) : undefined,
+//       rg: data.rg ?? undefined,
+//       cpf: data.cpf ?? undefined,
+//       drivers_license: data.drivers_license ?? undefined,
+//       occupation_id: data.occupation_id ?? undefined,
+//       admission_date: data.admission_date ? new Date(data.admission_date) : undefined,
+//     },
+//   });
 
-  // 🔹 Atualiza ou cria telefone
-  if (data.phones?.create?.phoneNumber) {
-    const existingPhone = await prisma.phone.findFirst({
-      where: { employee_id: Number(employee_id) },
-    });
+//   // 🔹 Atualiza ou cria telefone
+//   if (data.phones?.create?.phoneNumber) {
+//     const existingPhone = await prisma.phone.findFirst({
+//       where: { employee_id: Number(employee_id) },
+//     });
 
-    if (existingPhone) {
-      await prisma.phone.update({
-        where: { id: existingPhone.id },
-        data: { phoneNumber: data.phones.create.phoneNumber },
-      });
-    } else {
-      await prisma.phone.create({
-        data: {
-          employee_id: Number(employee_id),
-          phoneNumber: data.phones.create.phoneNumber,
-        },
-      });
-    }
-  }
+//     if (existingPhone) {
+//       await prisma.phone.update({
+//         where: { id: existingPhone.id },
+//         data: { phoneNumber: data.phones.create.phoneNumber },
+//       });
+//     } else {
+//       await prisma.phone.create({
+//         data: {
+//           employee_id: Number(employee_id),
+//           phoneNumber: data.phones.create.phoneNumber,
+//         },
+//       });
+//     }
+//   }
   
-  // 🔹 Atualiza ou cria endereço
-  if (data.address?.create) {
-    const existingAddress = await prisma.address.findFirst({
-      where: { employee_id: Number(employee_id) },
-    });
+//   // 🔹 Atualiza ou cria endereço
+//   if (data.address?.create) {
+//     const existingAddress = await prisma.address.findFirst({
+//       where: { employee_id: Number(employee_id) },
+//     });
 
-    if (existingAddress) {
-      await prisma.address.update({
-        where: { id: existingAddress.id },
-        data: {
-          zip_code: data.address.create.zip_code,
-          street_name: data.address.create.street_name,
-          number_of_house: Number(data.address.create.number_of_house),
-          neighborhood: data.address.create.neighborhood,
-          city: data.address.create.city,
-          state: data.address.create.state,
-          country: data.address.create.country,
-        },
-      });
-    } else {
-      await prisma.address.create({
-        data: {
-          employee_id: Number(employee_id),
-          ...data.address.create,
-        },
-      });
-    }
-  }
+//     if (existingAddress) {
+//       await prisma.address.update({
+//         where: { id: existingAddress.id },
+//         data: {
+//           zip_code: data.address.create.zip_code,
+//           street_name: data.address.create.street_name,
+//           number_of_house: Number(data.address.create.number_of_house),
+//           neighborhood: data.address.create.neighborhood,
+//           city: data.address.create.city,
+//           state: data.address.create.state,
+//           country: data.address.create.country,
+//         },
+//       });
+//     } else {
+//       await prisma.address.create({
+//         data: {
+//           employee_id: Number(employee_id),
+//           ...data.address.create,
+//         },
+//       });
+//     }
+//   }
   
-  // // 🔹 Atualiza CNH (se existir)
-  // if (data.cnhs?.create) {
-  //   const existingCnh = await prisma.cnh.findFirst({
-  //     where: { employee_id: Number(employee_id) },
-  //   });
+//   // // 🔹 Atualiza CNH (se existir)
+//   // if (data.cnhs?.create) {
+//   //   const existingCnh = await prisma.cnh.findFirst({
+//   //     where: { employee_id: Number(employee_id) },
+//   //   });
 
-  //   if (existingCnh) {
-  //     await prisma.cnh.update({
-  //       where: { id: existingCnh.id },
-  //       data: {
-  //         category_cnh: data.cnhs.create.category_cnh,
-  //         number_license: data.cnhs.create.number_license,
-  //         validity: new Date(data.cnhs.create.validity),
-  //         first_drivers_license: new Date(data.cnhs.create.first_drivers_license),
-  //       },
-  //     });
-  //   } else {
-  //     await prisma.cnh.create({
-  //       data: {
-  //         employee_id: Number(employee_id),
-  //         category_cnh: data.cnhs.create.category_cnh,
-  //         number_license: data.cnhs.create.number_license,
-  //         validity: new Date(data.cnhs.create.validity),
-  //         first_drivers_license: new Date(data.cnhs.create.first_drivers_license),
+//   //   if (existingCnh) {
+//   //     await prisma.cnh.update({
+//   //       where: { id: existingCnh.id },
+//   //       data: {
+//   //         category_cnh: data.cnhs.create.category_cnh,
+//   //         number_license: data.cnhs.create.number_license,
+//   //         validity: new Date(data.cnhs.create.validity),
+//   //         first_drivers_license: new Date(data.cnhs.create.first_drivers_license),
+//   //       },
+//   //     });
+//   //   } else {
+//   //     await prisma.cnh.create({
+//   //       data: {
+//   //         employee_id: Number(employee_id),
+//   //         category_cnh: data.cnhs.create.category_cnh,
+//   //         number_license: data.cnhs.create.number_license,
+//   //         validity: new Date(data.cnhs.create.validity),
+//   //         first_drivers_license: new Date(data.cnhs.create.first_drivers_license),
           
-  //       },
-  //     });
-  //   }
-  // }
+//   //       },
+//   //     });
+//   //   }
+//   // }
 
-  // 🔹 Atualiza ou cria CNH
-if (data.cnh?.create && Array.isArray(data.cnh.create) && data.cnh.create.length > 0) {
-  const cnhData = data.cnh.create[0]; // considerando apenas 1 CNH por funcionário
+//   // 🔹 Atualiza ou cria CNH
+//   try {
+    
+//     const existingCnh = await prisma.cnh.findFirst({
+//       where: { employee_id: Number(employee_id) },
+//     });
 
-  const existingCnh = await prisma.cnh.findFirst({
-    where: { employee_id: Number(employee_id) },
-  });
+//     if (data.cnh?.create && Array.isArray(data.cnh.create) && data.cnh.create.length === 0 && data.drivers_license === false) {
+//       await prisma.cnh.update({
+//         where: { id: existingCnh.id },
+//         data: {
+//           active: false
+          
+//         }}) }
+//       } catch (error) {
+//         console.log(error);
+        
+//       }
 
-  if (existingCnh) {
-    await prisma.cnh.update({
-      where: { id: existingCnh.id },
-      data: {
-        category_cnh: cnhData.category_cnh,
-        number_license: cnhData.number_license,
-        validity: new Date(cnhData.validity),
-        first_drivers_license: new Date(cnhData.first_drivers_license),
-      },
-    });
-  } else {
-    await prisma.cnh.create({
-      data: {
-        employee_id: Number(employee_id),
-        category_cnh: cnhData.category_cnh,
-        number_license: cnhData.number_license,
-        validity: new Date(cnhData.validity),
-        first_drivers_license: new Date(cnhData.first_drivers_license),
-      },
-    });
-  }
-}
+// if (data.cnh?.create && Array.isArray(data.cnh.create) && data.cnh.create.length > 0) {
+//   const cnhData = data.cnh.create[0]; // considerando apenas 1 CNH por funcionário
+
+//   const existingCnh = await prisma.cnh.findFirst({
+//     where: { employee_id: Number(employee_id) },
+//   });
+
+//   if (existingCnh) {
+//     // if( existingCnh && data.employee.drivers_license === false){
+//       // await prisma.cnh.update({
+//       //    where: { id: existingCnh.id },
+//       // data: {}
+//       // })
+//     }
+//     await prisma.cnh.update({
+//       where: { id: existingCnh.id },
+//       data: {
+//         category_cnh: cnhData.category_cnh,
+//         number_license: cnhData.number_license,
+//         validity: new Date(cnhData.validity),
+//         first_drivers_license: new Date(cnhData.first_drivers_license),
+//       },
+//     });
+//   } else {
+//     await prisma.cnh.create({
+//       data: {
+//         employee_id: Number(employee_id),
+//         category_cnh: cnhData.category_cnh,
+//         number_license: cnhData.number_license,
+//         validity: new Date(cnhData.validity),
+//         first_drivers_license: new Date(cnhData.first_drivers_license),
+//       },
+//     });
+//   }
+    
   
-  // 🔹 Atualiza o projeto vinculado
-  if (data.project_team?.create?.project_id) {
-    const existingTeam = await prisma.project_team.findFirst({
+//   // 🔹 Atualiza o projeto vinculado
+//   if (data.project_team?.create?.project_id) {
+//     const existingTeam = await prisma.project_team.findFirst({
+//       where: { employee_id: Number(employee_id) },
+//     });
+
+//     if (existingTeam) {
+//       await prisma.project_team.update({
+//         where: { id: existingTeam.id },
+//         data: {
+//           project_id: Number(data.project_team.create.project_id),
+//           active: data.project_team.create.active,
+//         },
+//       });
+//     } else {
+//       await prisma.project_team.create({
+//         data: {
+//           employee_id: Number(employee_id),
+//           project_id: Number(data.project_team.create.project_id),
+//           active: true,
+//         },
+//       });
+//     }
+//   }
+  
+//   // 🔹 Retorna o funcionário atualizado com os relacionamentos
+//   return prisma.employee.findUnique({
+//     where: { id: Number(employee_id) },
+//     include: {
+//       phones: true,
+//       address: true,
+//       cnhs: true,
+//       occupation: true,
+//       project_team: true,
+//     },
+//   });
+// } 
+// catch (error) {
+//   throw new Error(error);
+  
+// }
+// }
+
+
+async function updateEmployeeWithRelations(employee_id, data) {
+  console.log("Dados recebidos no repository:", data);
+  try {
+    // 🔹 Atualiza dados principais do funcionário
+    const updatedEmployee = await prisma.employee.update({
+      where: { id: Number(employee_id) },
+      data: {
+        name: data.name ?? undefined,
+        date_of_birth: data.date_of_birth ? new Date(data.date_of_birth) : undefined,
+        rg: data.rg ?? undefined,
+        cpf: data.cpf ?? undefined,
+        drivers_license: data.drivers_license ?? undefined,
+        occupation_id: data.occupation_id ?? undefined,
+        admission_date: data.admission_date ? new Date(data.admission_date) : undefined,
+      },
+    });
+
+    // 🔹 Atualiza ou cria telefone
+    if (data.phones?.create?.phoneNumber) {
+      const existingPhone = await prisma.phone.findFirst({
+        where: { employee_id: Number(employee_id) },
+      });
+
+      if (existingPhone) {
+        await prisma.phone.update({
+          where: { id: existingPhone.id },
+          data: { phoneNumber: data.phones.create.phoneNumber },
+        });
+      } else {
+        await prisma.phone.create({
+          data: {
+            employee_id: Number(employee_id),
+            phoneNumber: data.phones.create.phoneNumber,
+          },
+        });
+      }
+    }
+
+    // 🔹 Atualiza ou cria endereço
+    if (data.address?.create) {
+      const existingAddress = await prisma.address.findFirst({
+        where: { employee_id: Number(employee_id) },
+      });
+
+      if (existingAddress) {
+        await prisma.address.update({
+          where: { id: existingAddress.id },
+          data: {
+            zip_code: data.address.create.zip_code,
+            street_name: data.address.create.street_name,
+            number_of_house: Number(data.address.create.number_of_house),
+            neighborhood: data.address.create.neighborhood,
+            city: data.address.create.city,
+            state: data.address.create.state,
+            country: data.address.create.country,
+          },
+        });
+      } else {
+        await prisma.address.create({
+          data: {
+            employee_id: Number(employee_id),
+            ...data.address.create,
+          },
+        });
+      }
+    }
+
+    // 🔹 CNH — versão definitiva
+    const existingCnh = await prisma.cnh.findFirst({
       where: { employee_id: Number(employee_id) },
     });
 
-    if (existingTeam) {
-      await prisma.project_team.update({
-        where: { id: existingTeam.id },
-        data: {
-          project_id: Number(data.project_team.create.project_id),
-          active: data.project_team.create.active,
-        },
-      });
-    } else {
-      await prisma.project_team.create({
-        data: {
-          employee_id: Number(employee_id),
-          project_id: Number(data.project_team.create.project_id),
-          active: true,
-        },
-      });
-    }
-  }
-  
-  // 🔹 Retorna o funcionário atualizado com os relacionamentos
-  return prisma.employee.findUnique({
-    where: { id: Number(employee_id) },
-    include: {
-      phones: true,
-      address: true,
-      cnhs: true,
-      occupation: true,
-      project_team: true,
-    },
-  });
-} 
-catch (error) {
-  throw new Error(error);
-  
-}
-}
+    if (data.drivers_license === false || !data.cnh?.create?.length) {
+      // Usuário removeu CNH → apagar todas
+      if (existingCnh) {
+        await prisma.cnh.deleteMany({
+          where: { employee_id: Number(employee_id) },
+        });
+        console.log("CNH removida do funcionário:", employee_id);
+      }
+    } else if (Array.isArray(data.cnh.create) && data.cnh.create.length > 0) {
+      // Usuário possui CNH → criar ou atualizar
+      const cnhData = data.cnh.create[0];
 
+      if (existingCnh) {
+        await prisma.cnh.update({
+          where: { id: existingCnh.id },
+          data: {
+            category_cnh: cnhData.category_cnh,
+            number_license: cnhData.number_license,
+            validity: new Date(cnhData.validity),
+            first_drivers_license: new Date(cnhData.first_drivers_license),
+          },
+        });
+        console.log("CNH atualizada para funcionário:", employee_id);
+      } else {
+        await prisma.cnh.create({
+          data: {
+            employee_id: Number(employee_id),
+            category_cnh: cnhData.category_cnh,
+            number_license: cnhData.number_license,
+            validity: new Date(cnhData.validity),
+            first_drivers_license: new Date(cnhData.first_drivers_license),
+          },
+        });
+        console.log("CNH criada para funcionário:", employee_id);
+      }
+    }
+
+    // 🔹 Atualiza o projeto vinculado
+    if (data.project_team?.create?.project_id) {
+      const existingTeam = await prisma.project_team.findFirst({
+        where: { employee_id: Number(employee_id) },
+      });
+
+      if (existingTeam) {
+        await prisma.project_team.update({
+          where: { id: existingTeam.id },
+          data: {
+            project_id: Number(data.project_team.create.project_id),
+            active: data.project_team.create.active,
+          },
+        });
+      } else {
+        await prisma.project_team.create({
+          data: {
+            employee_id: Number(employee_id),
+            project_id: Number(data.project_team.create.project_id),
+            active: true,
+          },
+        });
+      }
+    }
+
+    // 🔹 Retorna o funcionário atualizado com os relacionamentos
+    return prisma.employee.findUnique({
+      where: { id: Number(employee_id) },
+      include: {
+        phones: true,
+        address: true,
+        cnhs: true,
+        occupation: true,
+        project_team: true,
+      },
+    });
+  } catch (error) {
+    console.error("Erro no updateEmployeeWithRelations:", error);
+    throw new Error(error.message);
+  }
+}
 
 
 async function deactivate_employee(employee_id) {
@@ -414,8 +589,24 @@ async function deactivate_employee(employee_id) {
  }
 }
 
+async function remove_all_cnh_for_employee(employee_id) {
+  const empId = Number(employee_id);
+  if (!empId || isNaN(empId)) {
+    throw new Error("ID do funcionário não foi informado ao remover CNHs.");
+  }
+
+  const result = await prisma.cnh.updateMany({
+    where: { employee_id: empId, active: true },
+    data: { active: false }
+  });
+
+  return result;
+}
+
+
+
 const employee_repository = {
-    get_all_employees ,employee_project,create_employee, create_cnh, find_employee_by_id,find_employee, deactivate_employee, updateEmployeeWithRelations,find_employee_by_project
+    get_all_employees ,employee_project,create_employee, create_cnh, find_employee_by_id,find_employee, deactivate_employee, updateEmployeeWithRelations,find_employee_by_project, remove_all_cnh_for_employee
 };
 
 export default employee_repository;

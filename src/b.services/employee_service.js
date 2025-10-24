@@ -54,24 +54,47 @@ return employee_by_project;
     }
 }
 
-async function update_employee(employee_id, data) {
+// async function update_employee(employee_id, data) {
     
-    try {
-        if (!employee_id || !data || employee_id === undefined || data === undefined) {
-            throw new Error("É obrigatório informar os dados corretos");
-        }
-        console.log(data, "services");
+//     try {
+//         if (!employee_id || !data || employee_id === undefined || data === undefined) {
+//             throw new Error("É obrigatório informar os dados corretos");
+//         }
+//         console.log(data, "services");
         
-        const employee_exists = await employee_repository.find_employee_by_id(employee_id);
-    if (!employee_exists){
-throw new Error ("Funcionário não encontrado")
-    }
-    await employee_repository.updateEmployeeWithRelations(employee_id, data)
-    return
-    } catch (error) {
-        throw new Error(error.message);
-    }
+//         const employee_exists = await employee_repository.find_employee_by_id(employee_id);
+//     if (!employee_exists){
+// throw new Error ("Funcionário não encontrado")
+//     }
+//     await employee_repository.updateEmployeeWithRelations(employee_id, data)
+//     return
+//     } catch (error) {
+//         throw new Error(error.message);
+//     }
+// }
+
+
+
+async function update_employee(employee_id, data) {
+  console.log("Payload recebido para update:", JSON.stringify(data, null, 2));
+
+  // Normaliza o campo de CNH
+  if (!data.cnh) data.cnh = [];
+
+  if (data.drivers_license === false || data.cnh.length === 0) {
+    // Desativa todas as CNHs existentes
+    await employee_repository.remove_all_cnh_for_employee(employee_id);
+  } else if (data.cnh.length > 0) {
+    // Cria ou atualiza CNHs
+    await employee_repository.upsert_cnhs(employee_id, data.cnh);
+  }
+
+  // Atualiza dados gerais do funcionário
+  const updated = await employee_repository.updateEmployeeWithRelations(employee_id, data);
+  return updated;
 }
+
+
 
 async function delete_employee(employee_id) {
     try {
