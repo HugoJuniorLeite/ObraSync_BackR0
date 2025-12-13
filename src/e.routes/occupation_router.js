@@ -13,3 +13,4 @@ occupation_router.put("/delete-occupation/:occupation_id", occupation_controller
 
 
 export default occupation_router;
+

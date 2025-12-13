@@ -39,7 +39,6 @@ model occupation {
   total_salary              Float
   employees                 employee[]
   services                  occupation_service[]
- 
 }
 
 model service {
@@ -78,11 +77,9 @@ model bill {
   service              service           @relation(fields: [service_id], references: [id])
   technical            employee?         @relation(fields: [technical_id], references: [id])
   daily_reports        daily_report[]    @relation("bill_reports")
-  
+
   @@map("bill")
 }
-
-
 
 model project {
   id                   Int            @id @default(autoincrement())
@@ -102,6 +99,7 @@ model project {
   firm                 firm           @relation(fields: [firm_id], references: [id])
   project_team         project_team[]
   services             service[]
+
   @@index([start_date, estimated_end_date])
 }
 
@@ -135,7 +133,7 @@ model project_team {
   active      Boolean  @default(true)
   employee    employee @relation(fields: [employee_id], references: [id])
   project     project  @relation(fields: [project_id], references: [id])
- 
+
   @@map("project_team")
 }
 
@@ -206,23 +204,24 @@ model consultant {
 }
 
 model employee {
-  id              Int            @id @default(autoincrement())
+  id              Int              @id @default(autoincrement())
   name            String
-  date_of_birth   DateTime       @db.Date
+  date_of_birth   DateTime         @db.Date
   rg              String
-  cpf             String         @unique
+  cpf             String           @unique
   drivers_license Boolean
   occupation_id   Int
-  admission_date  DateTime       @db.Date
+  admission_date  DateTime         @db.Date
   password_hash   String?
-  active          Boolean        @default(true)
-  first_access    Boolean        @default(false)
+  active          Boolean          @default(true)
+  first_access    Boolean          @default(false)
   address         address?
   cnhs            cnh[]
-  occupation      occupation     @relation(fields: [occupation_id], references: [id])
+  occupation      occupation       @relation(fields: [occupation_id], references: [id])
   phones          phone[]
   project_team    project_team[]
   bill            bill[]
+  mobile_journeys mobile_journey[]
 
   @@map("employee")
 }
@@ -244,16 +243,16 @@ enum status_project {
 }
 
 model street_data {
-  id        Int      @id @default(autoincrement())
-  name      String
-  data      Json
+  id           Int           @id @default(autoincrement())
+  name         String
+  data         Json
   daily_report daily_report?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 }
 
 model daily_report {
-  id                    Int         @id @default(autoincrement())
+  id                    Int          @id @default(autoincrement())
   pipe_branch_diameter  String
   pipe_network_diameter String
   signal_tape           Boolean
@@ -265,18 +264,18 @@ model daily_report {
   network_material      String
   branch_position       String
   network_pressure      String
-  flow_valve_type       Boolean @default(false)
+  flow_valve_type       Boolean      @default(false)
   mechanical_protection Boolean
   cut_branch            String
-  created_at            DateTime    @default(now())
+  created_at            DateTime     @default(now())
   components            component[]
   photos                photo[]
   welds                 weld[]
   trenches              trench[]
-  bill                  bill        @relation("bill_reports", fields: [bill_id], references: [id])
+  bill                  bill         @relation("bill_reports", fields: [bill_id], references: [id])
   bill_id               Int
-  streetDataId  Int?    @unique    
-  street_data   street_data? @relation(fields: [streetDataId], references: [id])
+  streetDataId          Int?         @unique
+  street_data           street_data? @relation(fields: [streetDataId], references: [id])
 }
 
 model component {
@@ -303,7 +302,7 @@ model photo {
   tachao                String?
 
   daily_report    daily_report @relation(fields: [daily_report_id], references: [id])
-  daily_report_id       Int    @unique     
+  daily_report_id Int          @unique
 }
 
 model weld {
@@ -326,6 +325,98 @@ model trench {
 
   daily_report    daily_report? @relation(fields: [daily_report_id], references: [id])
   daily_report_id Int?
+}
+
+model mobile_journey {
+  id                 Int       @id @default(autoincrement())
+  date               String // "2025-11-23"
+  employee_id        Int // técnico dono da jornada
+  inicio_expediente  DateTime?
+  fim_expediente     DateTime?
+  expediente_gps_lat Float?
+  expediente_gps_lng Float?
+  assinatura         String? // dataURL da assinatura
+
+  lunches     mobile_lunch[]
+  attendances mobile_attendance[]
+  base_logs   mobile_base_log[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  employee employee @relation(fields: [employee_id], references: [id])
+}
+
+model mobile_lunch {
+  id                      Int       @id @default(autoincrement())
+  mobile_journey_id       Int
+  inicio                  DateTime?
+  fim                     DateTime?
+  lat_inicio              Float?
+  lng_inicio              Float?
+  lat_fim                 Float?
+  lng_fim                 Float?
+  suspenso_em             DateTime?
+  lat_suspenso            Float?
+  lng_suspenso            Float?
+  justificativa_suspensao String?
+  solicitante_suspensao   String?
+
+  journey mobile_journey @relation(fields: [mobile_journey_id], references: [id], onDelete: Cascade)
+}
+
+model mobile_attendance {
+  id                Int     @id @default(autoincrement())
+  mobile_journey_id Int
+  tipo              String // "externo" | "interno"
+  ordem_tipo        String? // 3 | 7 | 100000
+  ordem_prefixo     String? // opcional se quiser manter
+  ordem_numero      String? // "000000"
+  nota_enviada      Boolean @default(false)
+
+  deslocamento_inicio DateTime?
+  atendimento_inicio  DateTime?
+  finalizado_em       DateTime?
+
+  gps_inicio_lat  Float?
+  gps_inicio_lng  Float?
+  gps_chegada_lat Float?
+  gps_chegada_lng Float?
+
+  cep    String?
+  rua    String?
+  numero String?
+  bairro String?
+  cidade String?
+  estado String?
+
+  comentario String?
+  notas      String?
+
+  rota mobile_route_point[]
+
+  journey mobile_journey @relation(fields: [mobile_journey_id], references: [id], onDelete: Cascade)
+}
+
+model mobile_route_point {
+  id                   Int      @id @default(autoincrement())
+  mobile_attendance_id Int
+  time                 DateTime
+  lat                  Float
+  lng                  Float
+
+  attendance mobile_attendance @relation(fields: [mobile_attendance_id], references: [id], onDelete: Cascade)
+}
+
+model mobile_base_log {
+  id                Int      @id @default(autoincrement())
+  mobile_journey_id Int
+  tipo              String // "saida_base" | "chegada_base"
+  time              DateTime
+  lat               Float?
+  lng               Float?
+
+  journey mobile_journey @relation(fields: [mobile_journey_id], references: [id], onDelete: Cascade)
 }
 
 enum bill_status {

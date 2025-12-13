@@ -46,26 +46,55 @@ async function get_occupation_by_id_service(occupation_id) {
       }
 }
 
-async function update_occupation(data, occupation_id) {
+// antigo ------- async function update_occupation(data, occupation_id) {
   
     
-      try {
-        const selected_occuṕation = await occupation_repository.get_occupation_by_id(occupation_id);
-       console.log(selected_occuṕation, "service");
+//       try {
+//         const selected_occuṕation = await occupation_repository.get_occupation_by_id(occupation_id);
+//        console.log(selected_occuṕation, "service");
        
-        if (selected_occuṕation === null || !selected_occuṕation) {
-        throw new Error("Cargo não encontrado");
-      }
-       const occupation_exists = await occupation_repository.verify_occupation_exists(data.name)
-if (occupation_exists) {
-    throw new Error("Ocupação já cadastrada");
-}    
-      await occupation_repository.update_occupation_id(occupation_id, data);
-        return 
-    } catch (error) {
-        throw new Error(error.message);
+//         if (selected_occuṕation === null || !selected_occuṕation) {
+//         throw new Error("Cargo não encontrado");
+//       }
+//        const occupation_exists = await occupation_repository.verify_occupation_exists(data.name)
+// if (occupation_exists) {
+//     throw new Error("Ocupação já cadastrada");
+// }    
+//       await occupation_repository.update_occupation_id(occupation_id, data);
+//         return 
+//     } catch (error) {
+//         throw new Error(error.message);
         
-    }}
+//     }}
+
+
+// novo ------------
+async function update_occupation(data, occupation_id) {
+  try {
+    const selected_occupation = await occupation_repository.get_occupation_by_id(occupation_id);
+
+    if (!selected_occupation) {
+      throw new Error("Cargo não encontrado");
+    }
+
+    // Se o nome foi passado e é diferente do atual, aí sim verifica duplicidade
+    if (data.name && data.name !== selected_occupation.name) {
+      const occupation_exists = await occupation_repository.verify_occupation_exists(data.name);
+
+      // Só bloqueia se existir outro com este nome
+      if (occupation_exists && occupation_exists.id !== Number(occupation_id)) {
+        throw new Error("Ocupação já cadastrada");
+      }
+    }
+
+    await occupation_repository.update_occupation_id(occupation_id, data);
+    return;
+
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}
+
 
     async function deactivate_occupation_service(occupation_id) {
         if (!occupation_id || occupation_id === undefined) {

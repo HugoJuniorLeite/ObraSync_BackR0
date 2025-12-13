@@ -26,6 +26,9 @@ if (data.dangerousness) {
 async function get_all_occupations() {
     try {
         return prisma.occupation.findMany({
+          where:{
+            active: true
+          }
             });
 
     } catch (error) {

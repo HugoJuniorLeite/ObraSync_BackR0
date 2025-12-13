@@ -57,6 +57,7 @@ async function update_occupation_by_id(req, res) {
 
 async function deactivate_occupation_controller(req, res) {
     const occupation_id = req.params.occupation_id;
+    console.log(req.params.occupation_id, "chegou aqui")
       try {
         await occupation_service.deactivate_occupation_service(occupation_id)
         res.status(200).send("Cadastro excluído com sucesso")
