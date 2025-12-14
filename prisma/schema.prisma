@@ -415,6 +415,7 @@ model mobile_base_log {
   time              DateTime
   lat               Float?
   lng               Float?
+   motivo            String? 
 
   journey mobile_journey @relation(fields: [mobile_journey_id], references: [id], onDelete: Cascade)
 }

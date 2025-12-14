@@ -1,7 +1,12 @@
 import { Router } from "express";
+import express from "express";
 import controller from "../a.controllers/mobile_journey_controller.js";
 
+
+
 const router = Router();
+router.use(express.json());
+router.use(express.urlencoded({ extended: true }));
 
 // ------------------------------------------------------------
 // INÍCIO + FIM
@@ -29,6 +34,12 @@ router.post(
 router.post(
   "/mobile-attendances/:attendance_id/route-point",
   controller.add_route_point
+);
+
+
+router.patch(
+  "/mobile-attendances/:attendance_id/finish",
+  controller.finish_service
 );
 
 // ------------------------------------------------------------

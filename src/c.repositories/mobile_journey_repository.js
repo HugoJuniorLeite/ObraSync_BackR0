@@ -30,7 +30,7 @@ async function start_journey_repository(data) {
 async function create_attendance_repository(journeyId, data) {
   return prisma.mobile_attendance.create({
     data: {
-      
+
       mobile_journey_id: journeyId,
 
       tipo: data.tipo,
@@ -79,7 +79,6 @@ async function create_attendance_repository(journeyId, data) {
 // }
 
 async function start_service_repository(attendance_id, data) {
-  console.log("REPOSITORY:", attendance_id, data);
 
   return prisma.mobile_attendance.update({
     where: { id: attendance_id },
@@ -90,6 +89,26 @@ async function start_service_repository(attendance_id, data) {
 
       gps_chegada_lat: data.gps_chegada?.lat ?? null,
       gps_chegada_lng: data.gps_chegada?.lng ?? null,
+    },
+  });
+}
+
+
+
+// ------------------------------------------------------------
+// FINALIZAR ATEMDIMENTO
+// ------------------------------------------------------------
+
+async function finish_service_repository(attendanceId, data) {
+  return prisma.mobile_attendance.update({
+    where: { id: attendanceId },
+    data: {
+      finalizado_em: data.finalizado_em
+        ? new Date(data.finalizado_em)
+        : new Date(),
+
+      comentario: data.comentario ?? null,
+      notas: data.notas ?? null,
     },
   });
 }
@@ -206,6 +225,7 @@ async function add_lunch_repository(journey_id, lunch) {
 // BASE LOG
 // ------------------------------------------------------------
 async function add_base_log_repository(journey_id, log) {
+
   return prisma.mobile_base_log.create({
     data: {
       mobile_journey_id: journey_id,
@@ -213,6 +233,8 @@ async function add_base_log_repository(journey_id, log) {
       time: new Date(log.time),
       lat: log.lat ?? null,
       lng: log.lng ?? null,
+      motivo: log.motivo ?? null,
+
     },
   });
 }
@@ -255,6 +277,7 @@ export default {
   start_journey_repository,
   create_attendance_repository,
   start_service_repository,
+  finish_service_repository,
   finish_journey_repository,
   add_attendance_repository,
   add_route_point_repository,

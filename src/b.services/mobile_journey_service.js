@@ -38,10 +38,6 @@ async function start_service_service(attendanceId, data) {
   if (!attendanceId) {
     throw new Error("attendanceId é obrigatório");
   }
-
-  console.log("SERVICE:", attendanceId, data);
-
-  // 👉 Service NÃO renomeia payload sem necessidade
   return repo.start_service_repository(attendanceId, data);
 }
 
@@ -70,6 +66,18 @@ async function add_route_point_service(attendance_id, point) {
 }
 
 // ------------------------------------------------------------
+// fINALIZAR ATENDIMENTO
+// ------------------------------------------------------------
+async function finish_service_service(attendanceId, data) {
+  if (!attendanceId) {
+    throw new Error("attendance_id é obrigatório");
+  }
+
+  return repo.finish_service_repository(attendanceId, data);
+}
+
+
+// ------------------------------------------------------------
 // ALMOÇO
 // ------------------------------------------------------------
 async function add_lunch_service(journey_id, lunch) {
@@ -80,6 +88,18 @@ async function add_lunch_service(journey_id, lunch) {
 // BASE LOG
 // ------------------------------------------------------------
 async function add_base_log_service(journey_id, log) {
+    if (!journey_id) {
+    throw new Error("journey_id é obrigatório");
+  }
+
+  if (!log.tipo) {
+    throw new Error("tipo do base log é obrigatório");
+  }
+
+  if (!log.time) {
+    throw new Error("time é obrigatório");
+  }
+
   return repo.add_base_log_repository(journey_id, log);
 }
 
@@ -100,11 +120,12 @@ export default {
   start_journey_service,
   create_attendance_service,
   start_service_service,
-  finish_journey_service,
+  finish_service_service,
   add_attendance_service,
   add_route_point_service,
   add_lunch_service,
   add_base_log_service,
   list_journeys_service,
   get_journey_by_id_service,
+  finish_journey_service,
 };

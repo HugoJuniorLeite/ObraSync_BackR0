@@ -13,9 +13,25 @@ async function start_journey(req, res) {
 }
 
 // ------------------------------------------------------------
+// FIM DA JORNADA
+// ------------------------------------------------------------
+
+async function finish_journey(req, res) {
+
+  try {
+    const { id } = req.params;
+    const updated = await service.finish_journey_service(Number(id), req.body);
+    return res.status(200).json(updated);
+  } catch (e) {
+    return res.status(400).json({ message: e.message });
+  }
+}
+
+// ------------------------------------------------------------
 // INICIAR DESLOCAMENTO → CRIAR ATENDIMENTO (STEP 4)
 // ------------------------------------------------------------
 async function create_attendance(req, res) {
+console.log("CREATE ATTENDANCE", req.body)
   try {
     const { journey_id } = req.params;
 
@@ -53,10 +69,10 @@ async function create_attendance(req, res) {
 // }
 
 async function start_service(req, res) {
+  
   try {
     const { attendance_id } = req.params;
-console.log("START SERVICE:", attendance_id, req.body);
-
+    console.log("START SERVICE:", attendance_id, req.body);
     const updated = await service.start_service_service(
       Number(attendance_id),
       req.body
@@ -71,17 +87,26 @@ console.log("START SERVICE:", attendance_id, req.body);
 
 
 // ------------------------------------------------------------
-// FINALIZAR
+// FINALIZAR ATENDIMENTO
 // ------------------------------------------------------------
-async function finish_journey(req, res) {
+
+async function finish_service(req, res) {
   try {
-    const { id } = req.params;
-    const updated = await service.finish_journey_service(Number(id), req.body);
+    const { attendance_id } = req.params;
+console.log("FOTOS RECEBIDAS:", req.body.fotos?.length);
+
+    const updated = await service.finish_service_service(
+      Number(attendance_id),
+      req.body
+    );
+
     return res.status(200).json(updated);
-  } catch (e) {
-    return res.status(400).json({ message: e.message });
+  } catch (error) {
+    console.error("Erro ao finalizar atendimento:", error);
+    return res.status(400).json({ message: error.message });
   }
 }
+
 
 // ------------------------------------------------------------
 // ATENDIMENTO
@@ -131,15 +156,38 @@ async function add_lunch(req, res) {
 // ------------------------------------------------------------
 // BASE LOG
 // ------------------------------------------------------------
+// async function add_base_log(req, res) {
+//   console.log("CONTROLLER LOG",   req.params.journey_id, res.body)
+//   try {
+//     const { journey_id } = req.params;
+
+//       console.log("CONTROLLER LOG",   journey_id, res.body)
+
+//     const created = await service.add_base_log_service(
+//       Number(journey_id),
+//       req.body
+//     );
+//     return res.status(201).json(created);
+//   } catch (e) {
+//     return res.status(400).json({ message: e.message });
+//   }
+// }
+
+
 async function add_base_log(req, res) {
+  console.log("CONTROLLER LOG", req.params, req.body);
+
   try {
     const { journey_id } = req.params;
+
     const created = await service.add_base_log_service(
       Number(journey_id),
       req.body
     );
+
     return res.status(201).json(created);
   } catch (e) {
+    console.error("Erro add_base_log:", e);
     return res.status(400).json({ message: e.message });
   }
 }
@@ -168,15 +216,19 @@ async function get_journey_by_id(req, res) {
 
 
 
+
+
+
 export default {
   start_journey,
   create_attendance,
   start_service,
-  finish_journey,
+  finish_service,
   add_attendance,
   add_route_point,
   add_lunch,
   add_base_log,
   list_journeys,
   get_journey_by_id,
+  finish_journey,
 };
