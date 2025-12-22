@@ -65,6 +65,8 @@ async function add_route_point_service(attendance_id, point) {
   return repo.add_route_point_repository(attendance_id, point);
 }
 
+
+
 // ------------------------------------------------------------
 // fINALIZAR ATENDIMENTO
 // ------------------------------------------------------------
@@ -77,11 +79,100 @@ async function finish_service_service(attendanceId, data) {
 }
 
 
+//------------------------------------------------------------
+//
+//------------------------------------------------------------
+// async function update_attendance_os_service(attendanceId, userId, data) {
+//   if (!attendanceId) {
+//     throw new Error("attendance_id é obrigatório");
+//   }
+
+//   // 🔒 autorização
+//   const attendance = await repo.find_attendance_by_id_and_user(
+//     attendanceId,
+//     userId
+//   );
+
+//   if (!attendance) {
+//     throw new Error("Atendimento não encontrado ou acesso negado");
+//   }
+
+//   // 🧠 regra de negócio (se quiser)
+//   if (!data.ordem_numero || data.ordem_numero.length !== 6) {
+//     throw new Error("Número da OS inválido");
+//   }
+
+//   return repo.update_attendance_os_repository(attendanceId, {
+//     tipo: data.tipo,
+//     ordem_tipo: data.ordem_tipo,
+//     ordem_numero: data.ordem_numero,
+//     nota_enviada: true,
+//   });
+// }
+
+
+// async function update_attendance_os_service(attendanceId, userId, data) {
+//   console.log("SERVICE", attendanceId, userId, data)
+//   const att = await repo.find_attendance_by_id_and_user(
+//     attendanceId,
+//     userId
+//   );
+
+//   if (!att) {
+//     throw new Error("Atendimento não encontrado ou acesso negado");
+//   }
+
+//   return repo.update_attendance_os_repository(attendanceId, {
+//     tipo: data.tipo,
+//     ordem_tipo: data.ordem_tipo,
+//     ordem_numero: data.ordem_numero,
+//     nota_enviada: true,
+//   });
+// }
+
+export async function update_attendance_os_service(
+  attendanceId,
+  userId,
+  data
+) {
+  const attendance = await repo.find_attendance_by_id(attendanceId);
+
+  if (!attendance) {
+    throw new Error("Atendimento não encontrado");
+  }
+
+  // 🔒 segurança REAL
+  if (attendance.journey.employee_id !== userId) {
+    throw new Error("Acesso negado ao atendimento");
+  }
+
+  return repo.update_attendance_os_repository(attendanceId, {
+    tipo: data.tipo,
+    ordem_tipo: data.ordem_tipo,
+    ordem_numero: data.ordem_numero,
+  });
+}
+
 // ------------------------------------------------------------
-// ALMOÇO
+// INICIA ALMOÇO
 // ------------------------------------------------------------
 async function add_lunch_service(journey_id, lunch) {
   return repo.add_lunch_repository(journey_id, lunch);
+}
+
+
+// ------------------------------------------------------------
+// FINALIZA ALMOÇO
+// ------------------------------------------------------------
+async function finish_lunch_service(journey_id, lunch) {
+  return repo.finish_lunch_repository(journey_id, lunch);
+}
+
+// ------------------------------------------------------------
+// SUSPENDE ALMOÇO
+// ------------------------------------------------------------
+async function suspend_lunch_service(journey_id, lunch) {
+  return repo.suspend_lunch_repository(journey_id, lunch);
 }
 
 // ------------------------------------------------------------
@@ -122,8 +213,11 @@ export default {
   start_service_service,
   finish_service_service,
   add_attendance_service,
+  update_attendance_os_service,
   add_route_point_service,
   add_lunch_service,
+  finish_lunch_service,
+  suspend_lunch_service,
   add_base_log_service,
   list_journeys_service,
   get_journey_by_id_service,

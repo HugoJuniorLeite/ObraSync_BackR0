@@ -93,7 +93,83 @@ async function start_service_repository(attendance_id, data) {
   });
 }
 
+//------------------------------------------------------------
+// EDITAR NUMERO DE OS
+//------------------------------------------------------------
 
+// async function find_attendance_by_id_and_user(attendanceId, userId) {
+//   return prisma.mobile_attendance.findFirst({
+//     where: {
+//       id: attendanceId,
+//       journey: {
+//         employee_id: userId,
+//       },
+//     },
+//   });
+// }
+
+
+// async function update_attendance_os_repository(attendanceId, data) {
+//   return prisma.mobile_attendance.update({
+//     where: { id: attendanceId },
+//     data: {
+//       ...data,
+//       updated_at: new Date(),
+//     },
+//   });
+// }
+
+// async function find_attendance_by_id_and_user(attendanceId) {
+//   return prisma.mobile_attendance.findUnique({
+//     where: { id: attendanceId },
+//   });
+// }
+
+// export async function find_attendance_by_id_and_user(attendanceId) {
+//   return prisma.mobile_attendance.findUnique({
+//     where: { id: attendanceId },
+//     include: {
+//       journey: true, // necessário para validar o dono no service
+//     },
+//   });
+// }
+
+
+// async function update_attendance_os_repository(attendanceId, data) {
+//   console.log("REPO 2", attendanceId, data)
+//  return prisma.mobile_attendance.update({
+//     where: { id: attendanceId },
+//     data: {
+//       tipo: data.tipo,
+//       ordem_tipo: data.ordem_tipo,
+//       ordem_numero: data.ordem_numero,
+//       nota_enviada: true,
+//       // updated_at: new Date(),
+//     },
+//   });
+// }
+
+
+export async function find_attendance_by_id(attendanceId) {
+  return prisma.mobile_attendance.findUnique({
+    where: { id: attendanceId },
+    include: {
+      journey: true, // 🔑 necessário para validar employee_id
+    },
+  });
+}
+
+export async function update_attendance_os_repository(attendanceId, data) {
+  return prisma.mobile_attendance.update({
+    where: { id: attendanceId },
+    data: {
+      tipo: data.tipo,
+      ordem_tipo: data.ordem_tipo,
+      ordem_numero: data.ordem_numero,
+      nota_enviada: true,
+    },
+  });
+}
 
 // ------------------------------------------------------------
 // FINALIZAR ATEMDIMENTO
@@ -195,31 +271,79 @@ async function add_route_point_repository(attendance_id, point) {
 // ------------------------------------------------------------
 // CRIAR ALMOÇO
 // ------------------------------------------------------------
+// async function add_lunch_repository(journey_id, lunch) {
+//   return prisma.mobile_lunch.create({
+//     data: {
+//       mobile_journey_id: journey_id,
+//       inicio: lunch.inicio ? new Date(lunch.inicio) : null,
+//       fim: lunch.fim ? new Date(lunch.fim) : null,
+
+//       lat_inicio: lunch.lat_inicio ?? null,
+//       lng_inicio: lunch.lng_inicio ?? null,
+
+//       lat_fim: lunch.lat_fim ?? null,
+//       lng_fim: lunch.lng_fim ?? null,
+
+//       suspenso_em: lunch.suspenso_em
+//         ? new Date(lunch.suspenso_em)
+//         : null,
+
+//       lat_suspenso: lunch.lat_suspenso ?? null,
+//       lng_suspenso: lunch.lng_suspenso ?? null,
+
+//       justificativa_suspensao: lunch.justificativa_suspensao ?? null,
+//       solicitante_suspensao: lunch.solicitante_suspensao ?? null,
+//     },
+//   });
+// }
+
 async function add_lunch_repository(journey_id, lunch) {
   return prisma.mobile_lunch.create({
     data: {
       mobile_journey_id: journey_id,
       inicio: lunch.inicio ? new Date(lunch.inicio) : null,
-      fim: lunch.fim ? new Date(lunch.fim) : null,
-
       lat_inicio: lunch.lat_inicio ?? null,
       lng_inicio: lunch.lng_inicio ?? null,
-
-      lat_fim: lunch.lat_fim ?? null,
-      lng_fim: lunch.lng_fim ?? null,
-
-      suspenso_em: lunch.suspenso_em
-        ? new Date(lunch.suspenso_em)
-        : null,
-
-      lat_suspenso: lunch.lat_suspenso ?? null,
-      lng_suspenso: lunch.lng_suspenso ?? null,
-
-      justificativa_suspensao: lunch.justificativa_suspensao ?? null,
-      solicitante_suspensao: lunch.solicitante_suspensao ?? null,
+      // status: "ativo",
     },
   });
 }
+
+
+//--------------------------------------------------------------
+//FINALIZA ALMOÇO
+//--------------------------------------------------------------
+async function finish_lunch_repository(id, data) {
+  return prisma.mobile_lunch.update({
+    where: { id },
+    data: {
+      fim: data.fim ? new Date(data.fim) : new Date(),
+      lat_fim: data.lat_fim ?? null,
+      lng_fim: data.lng_fim ?? null,
+      // status: "finalizado",
+
+    },
+  });
+}
+
+
+//--------------------------------------------------------------
+//SUSPENDE ALMOÇO
+//--------------------------------------------------------------
+async function suspend_lunch_repository(id, data) {
+  return prisma.mobile_lunch.update({
+    where: { id },
+    data: {
+      suspenso_em: data.suspenso_em ? new Date(data.suspenso_em) : new Date(),
+      lat_suspenso: data.lat_suspenso ?? null,
+      lng_suspenso: data.lng_suspenso ?? null,
+      justificativa_suspensao: data.justificativa_suspensao,
+      solicitante_suspensao: data.solicitante_suspensao,
+      // status: "suspenso",
+    },
+  });
+}
+
 
 // ------------------------------------------------------------
 // BASE LOG
@@ -245,9 +369,9 @@ async function add_base_log_repository(journey_id, log) {
 async function list_journeys_repository(filters) {
   return prisma.mobile_journey.findMany({
     where: {
-      employee_id: filters.employee_id
-        ? Number(filters.employee_id)
-        : undefined,
+      employee_id: Number(filters.employee_id),
+        // ? Number(filters.employee_id)
+        // : undefined,
 
       date: filters.date ?? undefined,
     },
@@ -282,6 +406,11 @@ export default {
   add_attendance_repository,
   add_route_point_repository,
   add_lunch_repository,
+  update_attendance_os_repository,
+  // find_attendance_by_id_and_user,
+  find_attendance_by_id,
+  finish_lunch_repository,
+  suspend_lunch_repository,
   add_base_log_repository,
   list_journeys_repository,
   get_journey_by_id_repository,

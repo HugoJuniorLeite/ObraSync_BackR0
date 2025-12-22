@@ -136,9 +136,50 @@ async function add_route_point(req, res) {
     return res.status(400).json({ message: e.message });
   }
 }
+//-----------------------------------------------
+// Update
+//-----------------------------------------------
+
+// async function update_attendance_os(req, res) {
+//   try {
+//     const { attendance_id } = req.params;
+//     const { tipo, ordem_tipo, ordem_numero } = req.body;
+
+//     const updated = await service.update_attendance_os_service({
+//       attendance_id: Number(attendance_id),
+//       user_id: req.user.id,
+//       tipo,
+//       ordem_tipo,
+//       ordem_numero,
+//     });
+
+//     return res.json(updated);
+//   } catch (e) {
+//     return res.status(400).json({ message: e.message });
+//   }
+// }
+
+async function update_attendance_os(req, res) {
+
+  try {
+    const attendanceId = Number(req.params.attendance_id);
+    const userId = Number(req.user.id);
+console.log("CONTROLER", attendanceId,  userId)
+    const updated = await service.update_attendance_os_service(
+      attendanceId,
+      userId,
+      req.body
+    );
+
+    return res.json(updated);
+  } catch (e) {
+    return res.status(400).json({ message: e.message });
+  }
+}
+
 
 // ------------------------------------------------------------
-// ALMOÇO
+// INICIA ALMOÇO
 // ------------------------------------------------------------
 async function add_lunch(req, res) {
   try {
@@ -152,6 +193,35 @@ async function add_lunch(req, res) {
     return res.status(400).json({ message: e.message });
   }
 }
+
+// ------------------------------------------------------------
+// FINALIZA ALMOÇO
+// ------------------------------------------------------------
+
+async function finish_lunch(req, res) {
+  try {
+    const { lunch_id } = req.params;
+    const updated = await service.finish_lunch_service(Number(lunch_id), req.body);
+    res.json(updated);
+  } catch (e) {
+    res.status(400).json({ message: e.message });
+  }
+}
+
+// ------------------------------------------------------------
+// SUSPENDE ALMOÇO
+// ------------------------------------------------------------
+async function suspend_lunch(req, res) {
+  try {
+    const { lunch_id } = req.params;
+    const updated = await service.suspend_lunch_service(Number(lunch_id), req.body);
+    res.json(updated);
+  } catch (e) {
+    res.status(400).json({ message: e.message });
+  }
+}
+
+
 
 // ------------------------------------------------------------
 // BASE LOG
@@ -195,17 +265,34 @@ async function add_base_log(req, res) {
 // ------------------------------------------------------------
 // LISTAR / GET
 // ------------------------------------------------------------
+// async function list_journeys(req, res) {
+//   try {
+//     console.log("entrou list_journeys", req.query)
+//     const journeys = await service.list_journeys_service(req.query);
+//     return res.status(200).json(journeys);
+//   } catch (e) {
+//     return res.status(400).json({ message: e.message });
+//   }
+// }
+
 async function list_journeys(req, res) {
   try {
-    const journeys = await service.list_journeys_service(req.query);
+    const journeys = await service.list_journeys_service({
+      employee_id: req.user.id,   // 🔥 vem do token
+      date: req.query.date,       // opcional
+    });
+
     return res.status(200).json(journeys);
   } catch (e) {
     return res.status(400).json({ message: e.message });
   }
 }
 
+
 async function get_journey_by_id(req, res) {
   try {
+        console.log("entrou list_journeys_by_id")
+
     const { id } = req.params;
     const journey = await service.get_journey_by_id_service(id);
     return res.status(200).json(journey);
@@ -226,7 +313,10 @@ export default {
   finish_service,
   add_attendance,
   add_route_point,
+  update_attendance_os,
   add_lunch,
+  finish_lunch,
+  suspend_lunch,
   add_base_log,
   list_journeys,
   get_journey_by_id,

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import express from "express";
 import controller from "../a.controllers/mobile_journey_controller.js";
+import { authMiddleware } from "../d.middlewares/auth_middleware.js";
 
 
 
@@ -42,10 +43,35 @@ router.patch(
   controller.finish_service
 );
 
+router.put(
+  "/mobile-attendances/:attendance_id/os",
+  authMiddleware,
+  controller.update_attendance_os
+);
+
+
 // ------------------------------------------------------------
-// ALMOÇO
+// INICIAR ALMOÇO
 // ------------------------------------------------------------
 router.post("/mobile-journeys/:journey_id/lunches", controller.add_lunch);
+
+// ------------------------------------------------------------
+// FINALIZAR ALMOÇO
+// ------------------------------------------------------------
+router.patch(
+  "/mobile-lunches/:lunch_id/finish",
+  controller.finish_lunch
+);
+
+
+// ------------------------------------------------------------
+// SUSPENDER ALMOÇO
+// ------------------------------------------------------------
+router.patch(
+  "/mobile-lunches/:lunch_id/suspend",
+  controller.suspend_lunch
+);
+
 
 // ------------------------------------------------------------
 // BASE LOG
@@ -55,7 +81,8 @@ router.post("/mobile-journeys/:journey_id/base-logs", controller.add_base_log);
 // ------------------------------------------------------------
 // LISTAGEM
 // ------------------------------------------------------------
-router.get("/mobile-journeys", controller.list_journeys);
+router.get("/mobile-journeys",   authMiddleware,      // 🔒 obrigatório
+ controller.list_journeys);
 router.get("/mobile-journeys/:id", controller.get_journey_by_id);
 
 
