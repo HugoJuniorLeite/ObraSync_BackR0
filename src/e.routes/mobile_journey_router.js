@@ -92,5 +92,11 @@ router.get("/mobile-journeys/:id", controller.get_journey_by_id);
 //   mobile_journey_controller.create_attendance_controller
 // );
 
+router.get(
+  "/mobile-journeys/active",
+  authMiddleware,
+  controller.get_active_journey_full
+);
+
 
 export default router;

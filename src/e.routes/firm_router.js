@@ -1,5 +1,5 @@
-import firm_controller from "../a.controllers/firm_controller.js";
 import { Router } from "express";
+import firm_controller from "../a.controllers/firm_controller.js";
 
 const firm_router = Router();
 

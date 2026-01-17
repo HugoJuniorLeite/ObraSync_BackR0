@@ -1,4 +1,4 @@
-import repo from "../c.repositories/mobile_journey_repository.js";
+ import repo from "../c.repositories/mobile_journey_repository.js";
 
 // ------------------------------------------------------------
 // INICIAR JORNADA
@@ -7,7 +7,7 @@ async function start_journey_service(data) {
   if (!data.employee_id || !data.date) {
     throw new Error("employee_id e date são obrigatórios.");
   }
-
+ console.log(data, "Service")
   return repo.start_journey_repository({
     date: data.date,
     employee_id: data.employee_id,
@@ -24,7 +24,7 @@ async function create_attendance_service(journeyId, data) {
   if (!journeyId) throw new Error("journey_id é obrigatório");
   if (!data.tipo) throw new Error("tipo é obrigatório");
 
-  return mobile_journey_repository.create_attendance_repository(
+  return repo.create_attendance_repository(
     journeyId,
     data
   );
@@ -207,6 +207,19 @@ async function get_journey_by_id_service(id) {
   return journey;
 }
 
+
+
+async function getActiveJourneyFull(employeeId) {
+  if (!employeeId) {
+    throw new Error("employeeId não informado");
+  }
+
+  // 🔒 Regra de negócio clara
+  // Jornada ativa = sem fim de expediente
+  return repository.findActiveJourneyByEmployee(employeeId);
+}
+
+
 export default {
   start_journey_service,
   create_attendance_service,
@@ -222,4 +235,5 @@ export default {
   list_journeys_service,
   get_journey_by_id_service,
   finish_journey_service,
+getActiveJourneyFull,
 };

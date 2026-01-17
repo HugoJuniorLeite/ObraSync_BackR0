@@ -5,6 +5,7 @@ import service from "../b.services/mobile_journey_service.js";
 // ------------------------------------------------------------
 async function start_journey(req, res) {
   try {
+    console.log(req.body, "COntroller")
     const created = await service.start_journey_service(req.body);
     return res.status(201).json(created);
   } catch (e) {
@@ -182,6 +183,8 @@ console.log("CONTROLER", attendanceId,  userId)
 // INICIA ALMOÇO
 // ------------------------------------------------------------
 async function add_lunch(req, res) {
+    console.log(req.params, "ADD_LUNCH")
+
   try {
     const { journey_id } = req.params;
     const created = await service.add_lunch_service(
@@ -199,6 +202,8 @@ async function add_lunch(req, res) {
 // ------------------------------------------------------------
 
 async function finish_lunch(req, res) {
+    console.log(req.params, "FINISH")
+
   try {
     const { lunch_id } = req.params;
     const updated = await service.finish_lunch_service(Number(lunch_id), req.body);
@@ -212,6 +217,7 @@ async function finish_lunch(req, res) {
 // SUSPENDE ALMOÇO
 // ------------------------------------------------------------
 async function suspend_lunch(req, res) {
+  console.log(req.params, "SUSPEND_LUNCH")
   try {
     const { lunch_id } = req.params;
     const updated = await service.suspend_lunch_service(Number(lunch_id), req.body);
@@ -303,6 +309,25 @@ async function get_journey_by_id(req, res) {
 
 
 
+async function get_active_journey_full(req, res) {
+  try {
+    const employeeId = req.user.employee_id;
+
+    const journey = await service.getActiveJourneyFull(employeeId);
+
+    if (!journey) {
+      return res.status(204).send();
+    }
+
+    return res.json(journey);
+  } catch (err) {
+    console.error("❌ Controller get_active_journey_full:", err);
+    return res.status(500).json({
+      message: "Erro ao buscar jornada ativa",
+    });
+  }
+}
+
 
 
 
@@ -321,4 +346,5 @@ export default {
   list_journeys,
   get_journey_by_id,
   finish_journey,
+get_active_journey_full,
 };

@@ -2,13 +2,16 @@ import prisma from "../database/prismaClient.js";
 
 function normalizeDate(date) {
   if (!date) return null;
-  return date.split("T")[0];
+  const d = new Date(date);
+  return d.toISOString().split("T")[0];
 }
+
 
 // ------------------------------------------------------------
 // CRIA JORNADA (APENAS INÍCIO DE EXPEDIENTE)
 // ------------------------------------------------------------
 async function start_journey_repository(data) {
+   console.log(data, "repository")
   return prisma.mobile_journey.create({
     data: {
       date: normalizeDate(data.date),
@@ -397,6 +400,31 @@ async function get_journey_by_id_repository(id) {
   });
 }
 
+
+
+async function findActiveJourneyByEmployee(employeeId) {
+  return prisma.mobile_journey.findFirst({
+    where: {
+      employee_id: employeeId,
+      fim_expediente: null,
+    },
+    include: {
+      lunches: true,
+      attendances: {
+        include: {
+          rota: true,
+        },
+      },
+      base_logs: true,
+      employee: true,
+    },
+    orderBy: {
+      inicio_expediente: "desc",
+    },
+  });
+}
+
+
 export default {
   start_journey_repository,
   create_attendance_repository,
@@ -414,4 +442,5 @@ export default {
   add_base_log_repository,
   list_journeys_repository,
   get_journey_by_id_repository,
+findActiveJourneyByEmployee,
 };
