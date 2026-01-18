@@ -9,7 +9,7 @@ import bill_router from "./bill_router.js";
 import auth_router from "./auth_router.js";
 import rdo_router from "./rdo_router.js";
 import mobile_journey_router from "./mobile_journey_router.js";
-import adminAttendancesRouter from "./adminAttendances_router.js";
+// import adminAttendancesRouter from "./adminAttendances_router.js";
 
 const router = Router();
 
@@ -23,7 +23,7 @@ router.use(bill_router);
 router.use(auth_router);
 router.use(rdo_router);
 router.use(mobile_journey_router);
-routes.use(adminAttendancesRouter);
+// routes.use(adminAttendancesRouter);
 
 
 export default router;
