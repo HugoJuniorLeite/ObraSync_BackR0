@@ -47,10 +47,7 @@ app.use(cors({
   credentials: true
 }));
 
-/**
- * 2️⃣ Preflight (OPTIONS)
- */
-app.options("*", cors());
+
 
 /**
  * 3️⃣ Body parser
