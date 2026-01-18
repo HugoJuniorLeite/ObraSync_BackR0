@@ -44,6 +44,15 @@
 
 import admin_attendances_repository from "../c.repositories/admin_attendances_repository.js";
 
+function normalizeDateStart(date) {
+  return new Date(`${date}T00:00:00.000Z`);
+}
+
+function normalizeDateEnd(date) {
+  return new Date(`${date}T23:59:59.999Z`);
+}
+
+
 async function create_admin_attendance_service(data) {
   if (!data) {
     throw new Error("Dados obrigatórios não informados");
@@ -52,9 +61,36 @@ async function create_admin_attendance_service(data) {
   return admin_attendances_repository.create_admin_attendance_repository(data);
 }
 
-async function get_all_admin_attendances_service(filters = {}) {
-  return admin_attendances_repository.get_all_admin_attendances_repository(filters);
+async function get_all_admin_attendances_service(filters) {
+  const {
+    startDate,
+    endDate,
+    technician,
+    search,
+  } = filters;
+
+  const normalizedFilters = {
+    technician,
+    search,
+  };
+
+  if (startDate && endDate) {
+    const start = normalizeDateStart(startDate);
+    const end = normalizeDateEnd(endDate);
+
+    if (isNaN(start) || isNaN(end)) {
+      throw new Error("Datas inválidas");
+    }
+
+    normalizedFilters.startDate = start;
+    normalizedFilters.endDate = end;
+  }
+
+  return admin_attendances_repository.get_all_admin_attendances_repository(
+    normalizedFilters
+  );
 }
+
 
 
 async function get_admin_attendance_by_id_service(attendance_id) {
