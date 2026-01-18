@@ -23,7 +23,7 @@
 
 
 // import admin_attendances_service from "../b.services/admin_attendances_service.js";
-import admin_attendances_service from "../b.services/admin_attendances_service";
+import admin_attendances_service from "../b.services/admin_attendances_service.js";
 
 async function create_admin_attendance_controller(req, res) {
     const data = req.body;
