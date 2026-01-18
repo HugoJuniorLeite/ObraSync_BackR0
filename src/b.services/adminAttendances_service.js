@@ -1,11 +1,13 @@
 // src/b.services/adminAttendances_service.js
 
-import adminAttendancesRepository from "../c.repositories/adminAttendances_repository.js";
+import adminAttendances_repository from "../c.repositories/adminAttendances_repository";
+
+// import adminAttendancesRepository from "../c.repositories/adminAttendances_repository.js";
 
 class AdminAttendancesService {
   async execute(filters) {
     const attendances =
-      await adminAttendancesRepository.findAttendances(filters);
+      await adminAttendances_repository.findAttendances(filters);
 
     return attendances.map((item) => {
       const start = item.created_at;
