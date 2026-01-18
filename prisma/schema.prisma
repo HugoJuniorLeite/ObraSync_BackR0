@@ -399,7 +399,8 @@ model mobile_attendance {
 
   rota mobile_route_point[]
 
-  admin_attendance admin_attendance?
+  admin_attendances admin_attendance[]
+
 
 
   journey mobile_journey @relation(fields: [mobile_journey_id], references: [id], onDelete: Cascade)
