@@ -77,6 +77,8 @@ model bill {
   service              service           @relation(fields: [service_id], references: [id])
   technical            employee?         @relation(fields: [technical_id], references: [id])
   daily_reports        daily_report[]    @relation("bill_reports")
+  admin_attendances admin_attendance[]
+
 
   @@map("bill")
 }
@@ -222,6 +224,8 @@ model employee {
   project_team    project_team[]
   bill            bill[]
   mobile_journeys mobile_journey[]
+  admin_attendances admin_attendance[]
+
 
   @@map("employee")
 }
@@ -395,6 +399,9 @@ model mobile_attendance {
 
   rota mobile_route_point[]
 
+  admin_attendance admin_attendance?
+
+
   journey mobile_journey @relation(fields: [mobile_journey_id], references: [id], onDelete: Cascade)
 }
 
@@ -436,18 +443,15 @@ enum bill_status {
 model admin_attendance {
   id Int @id @default(autoincrement())
 
-  // Relações principais
   mobile_attendance_id Int
   technician_id        Int
   bill_id              Int?
 
-  // Dados administrativos
   status        admin_attendance_status
   observation   String?
   reviewed_by   String?
   reviewed_at   DateTime?
 
-  // Dados de apoio à listagem (performance)
   attendance_date DateTime
   technician_name String
   os_number       String?
@@ -456,7 +460,6 @@ model admin_attendance {
 
   created_at DateTime @default(now())
 
-  // Relations
   mobile_attendance mobile_attendance @relation(fields: [mobile_attendance_id], references: [id])
   technician        employee          @relation(fields: [technician_id], references: [id])
   bill              bill?             @relation(fields: [bill_id], references: [id])
@@ -465,6 +468,7 @@ model admin_attendance {
   @@index([technician_id])
   @@index([status])
 }
+
 
 enum admin_attendance_status {
   pendente
