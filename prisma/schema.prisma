@@ -432,3 +432,45 @@ enum bill_status {
   cancelada
   reprogramada
 }
+
+model admin_attendance {
+  id Int @id @default(autoincrement())
+
+  // Relações principais
+  mobile_attendance_id Int
+  technician_id        Int
+  bill_id              Int?
+
+  // Dados administrativos
+  status        admin_attendance_status
+  observation   String?
+  reviewed_by   String?
+  reviewed_at   DateTime?
+
+  // Dados de apoio à listagem (performance)
+  attendance_date DateTime
+  technician_name String
+  os_number       String?
+  note_number     String?
+  address         String
+
+  created_at DateTime @default(now())
+
+  // Relations
+  mobile_attendance mobile_attendance @relation(fields: [mobile_attendance_id], references: [id])
+  technician        employee          @relation(fields: [technician_id], references: [id])
+  bill              bill?             @relation(fields: [bill_id], references: [id])
+
+  @@index([attendance_date])
+  @@index([technician_id])
+  @@index([status])
+}
+
+enum admin_attendance_status {
+  pendente
+  em_analise
+  aprovado
+  rejeitado
+  corrigir
+}
+
