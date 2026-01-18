@@ -52,9 +52,10 @@ async function create_admin_attendance_service(data) {
   return admin_attendances_repository.create_admin_attendance_repository(data);
 }
 
-async function get_all_admin_attendances_service() {
-  return admin_attendances_repository.get_all_admin_attendances_repository();
+async function get_all_admin_attendances_service(filters = {}) {
+  return admin_attendances_repository.get_all_admin_attendances_repository(filters);
 }
+
 
 async function get_admin_attendance_by_id_service(attendance_id) {
   if (!attendance_id) {
