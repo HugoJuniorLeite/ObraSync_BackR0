@@ -1,13 +1,13 @@
+// src/e.routes/adminAttendances_router.js
+
 import { Router } from "express";
-import controller from "../controllers/adminAttendances.controller.js";
-import authMiddleware from "../middlewares/auth.middleware.js";
+import adminAttendancesController from "../a.controllers/adminAttendances_controller.js";
 
-const router = Router();
+const adminAttendancesRouter = Router();
 
-router.get(
+adminAttendancesRouter.get(
   "/admin/attendances",
-  authMiddleware,
-  controller.index
+  adminAttendancesController.index
 );
 
-export default router;
+export default adminAttendancesRouter;
