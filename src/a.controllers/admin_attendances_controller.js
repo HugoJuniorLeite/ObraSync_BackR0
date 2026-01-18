@@ -42,17 +42,19 @@ async function create_admin_attendance_controller(req, res) {
 }
 
 async function get_all_admin_attendances_controller(req, res) {
-  const filters = req.query;
-
   try {
     const attendances =
-      await admin_attendances_service.get_all_admin_attendances_service(filters);
+      await admin_attendances_service.get_all_admin_attendances_service(
+        req.query
+      );
 
     res.status(200).json(attendances);
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    console.error("ADMIN ATTENDANCES ERROR:", error);
+    res.status(400).json({ message: error.message });
   }
 }
+
 
 
 async function get_admin_attendance_by_id_controller(req, res) {
