@@ -52,8 +52,7 @@
 
 // export default new AdminAttendancesRepository();
 
-
-import prisma from "../config/prisma_client.js";
+import prisma from "../database/prismaClient.js";
 
 async function create_admin_attendance_repository(data) {
   return prisma.admin_attendances.create({
