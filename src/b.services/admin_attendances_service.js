@@ -51,6 +51,17 @@ function normalizeDateStart(date) {
 function normalizeDateEnd(date) {
   return new Date(`${date}T23:59:59.999Z`);
 }
+function sanitizeFilters(filters) {
+  const clean = {};
+
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "") {
+      clean[key] = value;
+    }
+  });
+
+  return clean;
+}
 
 
 async function create_admin_attendance_service(data) {
@@ -61,7 +72,9 @@ async function create_admin_attendance_service(data) {
   return admin_attendances_repository.create_admin_attendance_repository(data);
 }
 
-async function get_all_admin_attendances_service(filters) {
+async function get_all_admin_attendances_service(rawFilters) {
+  const filters = sanitizeFilters(rawFilters);
+
   const {
     startDate,
     endDate,
@@ -69,10 +82,15 @@ async function get_all_admin_attendances_service(filters) {
     search,
   } = filters;
 
-  const normalizedFilters = {
-    technician,
-    search,
-  };
+  const normalized = {};
+
+  if (technician) {
+    normalized.technician = technician;
+  }
+
+  if (search) {
+    normalized.search = search;
+  }
 
   if (startDate && endDate) {
     const start = normalizeDateStart(startDate);
@@ -82,12 +100,12 @@ async function get_all_admin_attendances_service(filters) {
       throw new Error("Datas inválidas");
     }
 
-    normalizedFilters.startDate = start;
-    normalizedFilters.endDate = end;
+    normalized.startDate = start;
+    normalized.endDate = end;
   }
 
   return admin_attendances_repository.get_all_admin_attendances_repository(
-    normalizedFilters
+    normalized
   );
 }
 
