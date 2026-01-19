@@ -45,12 +45,18 @@
 import admin_attendances_repository from "../c.repositories/admin_attendances_repository.js";
 
 function normalizeDateStart(date) {
-  return new Date(`${date}T00:00:00.000Z`);
+  if (!date) return undefined;
+  const d = new Date(`${date}T00:00:00.000Z`);
+  return isNaN(d.getTime()) ? undefined : d;
 }
 
 function normalizeDateEnd(date) {
-  return new Date(`${date}T23:59:59.999Z`);
+  if (!date) return undefined;
+  const d = new Date(`${date}T23:59:59.999Z`);
+  return isNaN(d.getTime()) ? undefined : d;
 }
+
+
 function sanitizeFilters(filters) {
   const clean = {};
 
@@ -72,40 +78,41 @@ async function create_admin_attendance_service(data) {
   return admin_attendances_repository.create_admin_attendance_repository(data);
 }
 
-async function get_all_admin_attendances_service(rawFilters) {
-  const filters = sanitizeFilters(rawFilters);
+async function get_all_admin_attendances_service(filters = {}) {
+  const { startDate, endDate, technician, search } = filters;
 
-  const {
-    startDate,
-    endDate,
-    technician,
-    search,
-  } = filters;
+  const start = normalizeDateStart(startDate);
+  const end = normalizeDateEnd(endDate);
 
-  const normalized = {};
+  const where = {};
 
+  // 📅 Filtro por data (SÓ se válida)
+  if (start || end) {
+    where.attendance_date = {};
+    if (start) where.attendance_date.gte = start;
+    if (end) where.attendance_date.lte = end;
+  }
+
+  // 👷 Técnico
   if (technician) {
-    normalized.technician = technician;
+    where.technician_name = {
+      contains: technician,
+      mode: "insensitive",
+    };
   }
 
+  // 🔍 Busca geral
   if (search) {
-    normalized.search = search;
-  }
-
-  if (startDate && endDate) {
-    const start = normalizeDateStart(startDate);
-    const end = normalizeDateEnd(endDate);
-
-    if (isNaN(start) || isNaN(end)) {
-      throw new Error("Datas inválidas");
-    }
-
-    normalized.startDate = start;
-    normalized.endDate = end;
+    where.OR = [
+      { technician_name: { contains: search, mode: "insensitive" } },
+      { os_number: { contains: search, mode: "insensitive" } },
+      { note_number: { contains: search, mode: "insensitive" } },
+      { address: { contains: search, mode: "insensitive" } },
+    ];
   }
 
   return admin_attendances_repository.get_all_admin_attendances_repository(
-    normalized
+    where
   );
 }
 

@@ -50,11 +50,10 @@ async function get_all_admin_attendances_controller(req, res) {
 
     res.status(200).json(attendances);
   } catch (error) {
-    console.error("ADMIN ATTENDANCES ERROR:", error);
+    console.error(error);
     res.status(400).json({ message: error.message });
   }
 }
-
 
 
 async function get_admin_attendance_by_id_controller(req, res) {

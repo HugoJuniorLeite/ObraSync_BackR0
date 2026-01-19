@@ -7,38 +7,7 @@ async function create_admin_attendance_repository(data) {
   });
 }
 
-async function get_all_admin_attendances_repository(filters) {
-  const {
-    startDate,
-    endDate,
-    technician,
-    search,
-  } = filters;
-
-  const where = {};
-
-  if (technician) {
-    where.technician_name = {
-      contains: technician,
-      mode: "insensitive",
-    };
-  }
-
-  if (search) {
-    where.OR = [
-      { os_number: { contains: search, mode: "insensitive" } },
-      { note_number: { contains: search, mode: "insensitive" } },
-      { address: { contains: search, mode: "insensitive" } },
-    ];
-  }
-
-  if (startDate && endDate) {
-    where.attendance_date = {
-      gte: new Date(`${startDate}T00:00:00.000Z`),
-      lte: new Date(`${endDate}T23:59:59.999Z`),
-    };
-  }
-
+async function get_all_admin_attendances_repository(where) {
   return prisma.admin_attendance.findMany({
     where,
     orderBy: {
