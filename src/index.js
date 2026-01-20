@@ -23,7 +23,6 @@ app.listen(PORT, () => {
 
 export default app; */
 
-
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -33,38 +32,36 @@ import router from "./e.routes/index.js";
 
 const app = express();
 
-/**
- * 1️⃣ CORS – sempre ANTES das rotas
- */
+const allowedOrigins = [
+  "https://d3n78ekyg3zlc1.cloudfront.net",
+  "http://localhost:5173",
+];
+
 app.use(cors({
-  origin: [
-    "https://d3n78ekyg3zlc1.cloudfront.net",
-    "http://localhost:5173"
-  ],
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true
+  origin: function (origin, callback) {
+    // permite chamadas sem origin (Postman, curl)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error("Not allowed by CORS"));
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
 }));
 
+// 🔑 NÃO use app.options("*")
 
-
-/**
- * 3️⃣ Body parser
- */
 app.use(express.json());
 
-/**
- * 4️⃣ ROTAS (continua obrigatório)
- */
+// Rotas
 app.use(router);
 
-/**
- * 5️⃣ Server
- */
 const PORT = process.env.PORT || 4000;
-
 app.listen(PORT, () => {
-  console.log(`Running on port: ${PORT}`);
+  console.log(`🚀 Backend rodando na porta ${PORT}`);
 });
 
 export default app;

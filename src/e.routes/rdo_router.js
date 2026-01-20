@@ -3,6 +3,7 @@ import multer from "multer";
 // import rdo_controller from "../a.controllers/rdo_controller.js";
 import path from "path";
 import rdo_controller, { upload_photos_middleware } from "../a.controllers/rdo_controller.js";
+import cors from "cors";
 
 // Configuração do multer
 const storage = multer.diskStorage({
@@ -18,7 +19,20 @@ const upload = multer({ storage });
 
 const rdo_router = Router();
 
-rdo_router.post("/create-rdo",
+
+rdo_router.post(
+  "/create-rdo",
+
+  // 🔑 CORS ESPECÍFICO PARA ESTA ROTA (RESOLVE O PREFLIGHT)
+  cors({
+    origin: [
+      "https://d3n78ekyg3zlc1.cloudfront.net",
+      "http://localhost:5173",
+    ],
+    credentials: true,
+  }),
+
+  // (opcional) logger
   (req, res, next) => {
     // console.log("✅ ROTA /create-rdo FOI CHAMADA!");
     // console.log("📌 Método:", req.method);
@@ -26,13 +40,20 @@ rdo_router.post("/create-rdo",
     // console.log("📨 Content-Type:", req.headers["content-type"]);
     next();
   },
+
+  // 📸 multer
   upload_photos_middleware,
+
+  // (opcional) logger pós-multer
   (req, res, next) => {
     // console.log("📸 Após multer, req.files:", req.files);
     next();
   },
+
+  // 🎯 controller final
   rdo_controller.create_rdo_controller
 );
+
 
 // Outras rotas
 rdo_router.put("/not-executed/:bill_id", rdo_controller.rdo_not_executed);
