@@ -23,7 +23,6 @@ app.listen(PORT, () => {
 
 export default app; */
 
-
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -34,23 +33,27 @@ import router from "./e.routes/index.js";
 const app = express();
 
 /**
- * 1️⃣ CORS – sempre ANTES das rotas
+ * Configuração única de CORS
  */
-app.use(cors({
+const corsConfig = {
   origin: [
     "https://d3n78ekyg3zlc1.cloudfront.net",
-    // "https://obra-sync-front.onrender.com",
     "http://localhost:5173"
   ],
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
-}));
+};
 
 /**
- * 2️⃣ PRE-FLIGHT (ESSENCIAL)
+ * 1️⃣ CORS normal
  */
-app.options("*", cors());
+app.use(cors(corsConfig));
+
+/**
+ * 2️⃣ Preflight OPTIONS (MESMA config)
+ */
+app.options("*", cors(corsConfig));
 
 /**
  * 3️⃣ Body parser
@@ -58,7 +61,7 @@ app.options("*", cors());
 app.use(express.json());
 
 /**
- * 4️⃣ ROTAS (continua obrigatório)
+ * 4️⃣ Rotas
  */
 app.use(router);
 
@@ -66,9 +69,8 @@ app.use(router);
  * 5️⃣ Server
  */
 const PORT = process.env.PORT || 4000;
-
 app.listen(PORT, () => {
-  console.log(`Running on port: ${PORT}`);
+  console.log(`🚀 Backend rodando na porta ${PORT}`);
 });
 
 export default app;
