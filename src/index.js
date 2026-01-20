@@ -47,7 +47,10 @@ app.use(cors({
   credentials: true
 }));
 
-
+/**
+ * 2️⃣ PRE-FLIGHT (ESSENCIAL)
+ */
+app.options("*", cors());
 
 /**
  * 3️⃣ Body parser
