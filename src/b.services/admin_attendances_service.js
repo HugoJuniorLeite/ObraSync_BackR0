@@ -78,43 +78,74 @@ async function create_admin_attendance_service(data) {
   return admin_attendances_repository.create_admin_attendance_repository(data);
 }
 
-async function get_all_admin_attendances_service(filters = {}) {
-  const { startDate, endDate, technician, search } = filters;
 
-  const start = normalizeDateStart(startDate);
-  const end = normalizeDateEnd(endDate);
+function mapStatus(status) {
+  const map = {
+    aprovado: "OK",
+    em_analise: "WARNING",
+    pendente: "WARNING",
+    corrigir: "WARNING",
+    rejeitado: "ERROR",
+  };
 
-  const where = {};
-
-  // 📅 Filtro por data (SÓ se válida)
-  if (start || end) {
-    where.attendance_date = {};
-    if (start) where.attendance_date.gte = start;
-    if (end) where.attendance_date.lte = end;
-  }
-
-  // 👷 Técnico
-  if (technician) {
-    where.technician_name = {
-      contains: technician,
-      mode: "insensitive",
-    };
-  }
-
-  // 🔍 Busca geral
-  if (search) {
-    where.OR = [
-      { technician_name: { contains: search, mode: "insensitive" } },
-      { os_number: { contains: search, mode: "insensitive" } },
-      { note_number: { contains: search, mode: "insensitive" } },
-      { address: { contains: search, mode: "insensitive" } },
-    ];
-  }
-
-  return admin_attendances_repository.get_all_admin_attendances_repository(
-    where
-  );
+  return map[status] ?? "WARNING";
 }
+
+
+async function get_all_admin_attendances_service(filters = {}) {
+
+  const clean = sanitizeFilters(filters);
+
+  const where = {
+    ...(clean.startDate && {
+      attendance_date: {
+        gte: normalizeDateStart(clean.startDate),
+      },
+    }),
+
+    ...(clean.endDate && {
+      attendance_date: {
+        lte: normalizeDateEnd(clean.endDate),
+      },
+    }),
+
+    ...(clean.technician && {
+      technician_name: {
+        contains: clean.technician,
+        mode: "insensitive",
+      },
+    }),
+
+    ...(clean.search && {
+      os_number: {
+        contains: clean.search,
+      },
+    }),
+  };
+
+  const rows =
+    await admin_attendances_repository.get_all_admin_attendances_repository(
+      where
+    );
+
+  return rows.map((item) => ({
+    date: item.attendance_date,
+    technician: item.technician_name,
+    os: item.os_number,
+    note: item.note_number,
+    client: "-",          // futuro join
+    project: "-",         // futuro join
+    address: item.address,
+    start: item.deslocamento_inicio,
+    end: item.finalizado_em,
+    journey: item.finalizado_em
+      ? "Finalizada"
+      : "Em andamento",
+    distance: "-",        // futuro cálculo
+    status: mapStatus(item.status),
+  }));
+}
+
 
 
 
