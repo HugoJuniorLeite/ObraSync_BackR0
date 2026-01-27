@@ -2,13 +2,13 @@
 import prisma from "../database/prismaClient.js";
 
 async function create_admin_attendance_repository(data) {
-  return prisma.admin_attendances.create({
+  return prisma.admin_attendance.create({
     data
   });
 }
 
 async function get_all_admin_attendances_repository(where) {
-return prisma.admin_attendances.findMany({
+return prisma.admin_attendance.findMany({
     where,
     orderBy: {
       attendance_date: "desc",
@@ -29,13 +29,13 @@ return prisma.admin_attendances.findMany({
 
 
 async function get_admin_attendance_by_id_repository(attendance_id) {
-  return prisma.admin_attendances.findUnique({
+  return prisma.prisma.admin_attendance.findUnique({
     where: { id: Number(attendance_id) }
   });
 }
 
 async function update_admin_attendance_status_repository(attendance_id, status) {
-  return prisma.admin_attendances.update({
+  return prisma.prisma.admin_attendance.update({
     where: { id: Number(attendance_id) },
     data: { status }
   });
