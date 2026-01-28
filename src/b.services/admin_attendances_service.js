@@ -98,51 +98,54 @@ async function get_all_admin_attendances_service(filters = {}) {
 
   const where = {
     ...(clean.startDate && {
-      attendance_date: {
+      deslocamento_inicio: {
         gte: normalizeDateStart(clean.startDate),
       },
     }),
 
     ...(clean.endDate && {
-      attendance_date: {
+      deslocamento_inicio: {
         lte: normalizeDateEnd(clean.endDate),
       },
     }),
 
-    ...(clean.technician && {
-      technician_name: {
-        contains: clean.technician,
-        mode: "insensitive",
+    ...(clean.search && {
+      ordem_numero: {
+        contains: clean.search,
       },
     }),
 
-    ...(clean.search && {
-      os_number: {
-        contains: clean.search,
+    ...(clean.technician && {
+      journey: {
+        employee: {
+          name: {
+            contains: clean.technician,
+            mode: "insensitive",
+          },
+        },
       },
     }),
   };
 
   const rows =
-    await admin_attendances_repository.get_all_admin_attendances_repository(
-      where
-    );
+    await admin_attendances_repository.get_all_attendances_repository(where);
 
-return rows.map((item) => ({
-  date: item.deslocamento_inicio,
-  technician: item.journey.employee.name,
-  os: item.ordem_numero,
-  note: "-",
-  client: "-",
-  project: "-",
-  address: `${item.rua}, ${item.numero} - ${item.bairro}`,
-  start: item.atendimento_inicio,
-  end: item.finalizado_em,
-  journey: item.finalizado_em ? "Finalizada" : "Em andamento",
-  distance: "-",
-  status: item.finalizado_em ? "OK" : "WARNING",
-}));
+  return rows.map((item) => ({
+    date: item.deslocamento_inicio,
+    technician: item.journey.employee.name,
+    os: item.ordem_numero,
+    note: "-",
+    client: "-",
+    project: "-",
+    address: `${item.rua ?? ""} ${item.numero ?? ""} - ${item.bairro ?? ""}`,
+    start: item.atendimento_inicio,
+    end: item.finalizado_em,
+    journey: item.finalizado_em ? "Finalizada" : "Em andamento",
+    distance: "-",
+    status: item.finalizado_em ? "OK" : "WARNING",
+  }));
 }
+
 
 
 
