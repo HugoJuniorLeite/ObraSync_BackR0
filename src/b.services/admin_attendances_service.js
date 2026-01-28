@@ -96,32 +96,37 @@ async function get_all_admin_attendances_service(filters = {}) {
 
   const clean = sanitizeFilters(filters);
 
-  const where = {
-    ...(clean.startDate && {
-      attendance_date: {
-        gte: normalizeDateStart(clean.startDate),
-      },
-    }),
+ const where = {
+  ...(clean.startDate && {
+    deslocamento_inicio: {
+      gte: normalizeDateStart(clean.startDate),
+    },
+  }),
 
-    ...(clean.endDate && {
-      attendance_date: {
-        lte: normalizeDateEnd(clean.endDate),
-      },
-    }),
+  ...(clean.endDate && {
+    deslocamento_inicio: {
+      lte: normalizeDateEnd(clean.endDate),
+    },
+  }),
 
-    ...(clean.technician && {
-      technician_name: {
-        contains: clean.technician,
-        mode: "insensitive",
-      },
-    }),
+  ...(clean.search && {
+    ordem_numero: {
+      contains: clean.search,
+    },
+  }),
 
-    ...(clean.search && {
-      os_number: {
-        contains: clean.search,
+  ...(clean.technician && {
+    journey: {
+      employee: {
+        name: {
+          contains: clean.technician,
+          mode: "insensitive",
+        },
       },
-    }),
-  };
+    },
+  }),
+};
+
 
   const rows =
     await admin_attendances_repository.get_all_admin_attendances_repository(
