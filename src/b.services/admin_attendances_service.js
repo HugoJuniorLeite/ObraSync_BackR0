@@ -128,23 +128,20 @@ async function get_all_admin_attendances_service(filters = {}) {
       where
     );
 
-  return rows.map((item) => ({
-    date: item.attendance_date,
-    technician: item.technician_name,
-    os: item.os_number,
-    note: item.note_number,
-    client: "-",          // futuro join
-    project: "-",         // futuro join
-    address: item.address,
-    start: item.mobile_attendance?.deslocamento_inicio,
-    end: item.mobile_attendance?.finalizado_em,
-    journey: item.finalizado_em
-      ? "Finalizada"
-      : "Em andamento",
-    distance: "-",        // futuro cálculo
-    status: mapStatus(item.status),
-  }));
-}
+return rows.map((item) => ({
+  date: item.deslocamento_inicio,
+  technician: item.journey.employee.name,
+  os: item.ordem_numero,
+  note: "-",
+  client: "-",
+  project: "-",
+  address: `${item.rua}, ${item.numero} - ${item.bairro}`,
+  start: item.atendimento_inicio,
+  end: item.finalizado_em,
+  journey: item.finalizado_em ? "Finalizada" : "Em andamento",
+  distance: "-",
+  status: item.finalizado_em ? "OK" : "WARNING",
+}));
 
 
 

@@ -8,22 +8,20 @@ async function create_admin_attendance_repository(data) {
 }
 
 async function get_all_admin_attendances_repository(where) {
-  return prisma.admin_attendance.findMany({
+  return prisma.mobile_attendance.findMany({
     where,
     orderBy: {
-      attendance_date: "desc",
+      finalizado_em: "desc",
     },
     include: {
-      mobile_attendance: {
-        select: {
-          deslocamento_inicio: true,
-          finalizado_em: true,
+      journey: {
+        include: {
+          employee: true,
         },
       },
     },
   });
 }
-
 
 
 async function get_admin_attendance_by_id_repository(attendance_id) {
