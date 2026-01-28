@@ -6,23 +6,23 @@
 // // import adminAttendancesRepository from "../c.repositories/adminAttendances_repository.js";
 
 // class AdminAttendancesService {
-  //   async execute(filters) {
-    //     const attendances =
-    //       await adminAttendances_repository.findAttendances(filters);
-    
-    //     return attendances.map((item) => {
-      //       const start = item.created_at;
-      //       const end = item.finished_at;
-      
-      //       const journeyMinutes =
-      //         start && end ? Math.floor((end - start) / 60000) : 0;
-      
-      //       return {
-        //         date: start,
-        //         technician: item.technician?.name,
-        //         technician_id: item.technician?.id,
-        
-        //         os_number: item.service_order?.os_number,
+//   async execute(filters) {
+//     const attendances =
+//       await adminAttendances_repository.findAttendances(filters);
+
+//     return attendances.map((item) => {
+//       const start = item.created_at;
+//       const end = item.finished_at;
+
+//       const journeyMinutes =
+//         start && end ? Math.floor((end - start) / 60000) : 0;
+
+//       return {
+//         date: start,
+//         technician: item.technician?.name,
+//         technician_id: item.technician?.id,
+
+//         os_number: item.service_order?.os_number,
 //         invoice_number: item.service_order?.invoice_number,
 //         client: item.service_order?.client_name,
 //         project: item.service_order?.project_name,
@@ -74,7 +74,7 @@ async function create_admin_attendance_service(data) {
   if (!data) {
     throw new Error("Dados obrigatórios não informados");
   }
-  
+
   return admin_attendances_repository.create_admin_attendance_repository(data);
 }
 
@@ -136,8 +136,8 @@ async function get_all_admin_attendances_service(filters = {}) {
     client: "-",          // futuro join
     project: "-",         // futuro join
     address: item.address,
-    start: item.deslocamento_inicio,
-    end: item.finalizado_em,
+    start: item.mobile_attendance?.deslocamento_inicio,
+    end: item.mobile_attendance?.finalizado_em,
     journey: item.finalizado_em
       ? "Finalizada"
       : "Em andamento",
