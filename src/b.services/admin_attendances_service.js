@@ -142,7 +142,7 @@ return rows.map((item) => ({
   distance: "-",
   status: item.finalizado_em ? "OK" : "WARNING",
 }));
-
+}
 
 
 
