@@ -31,22 +31,7 @@ rdo_router.options(
  */
 rdo_router.post(
   "/create-rdo",
-
-  // 🔑 CORS ESPECÍFICO DA ROTA
-  cors({
-    origin: [
-      "https://d3n78ekyg3zlc1.cloudfront.net",
-      "http://localhost:5173",
-    ],
-    credentials: true,
-    methods: ["POST"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  }),
-
-  // 📸 Middleware de upload (multer)
   upload_photos_middleware,
-
-  // 🎯 Controller final
   rdo_controller.create_rdo_controller
 );
 
