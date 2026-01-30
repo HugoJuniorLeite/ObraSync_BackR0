@@ -32,31 +32,20 @@ import router from "./e.routes/index.js";
 
 const app = express();
 
-const allowedOrigins = [
-  "https://d3n78ekyg3zlc1.cloudfront.net",
-  "http://localhost:5173",
-];
-
 app.use(cors({
-  origin: function (origin, callback) {
-    // permite chamadas sem origin (Postman, curl)
-    if (!origin) return callback(null, true);
-
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-
-    return callback(new Error("Not allowed by CORS"));
-  },
+  origin: [
+    "https://d3n78ekyg3zlc1.cloudfront.net",
+    "http://localhost:5173",
+  ],
   credentials: true,
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 }));
 
-// 🔑 NÃO use app.options("*")
+app.options("*", cors());
 
 app.use(express.json());
 
-// Rotas
 app.use(router);
 
 const PORT = process.env.PORT || 4000;
