@@ -208,6 +208,8 @@ function map_fields_to_english(data, fotosUrls = {}) {
 // Controller principal
 export async function create_rdo_controller(req, res) {
   //  console.log(req.files, "Fotos");
+  console.log("🔥 ENTROU NO CONTROLLER CREATE RDO");
+
   console.log(req.body, "Recebido do front");
 
   try {
