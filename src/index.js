@@ -28,7 +28,6 @@ app.use(cors({
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
 }));
 
-// 🔑 NÃO use app.options("*")
 
 app.use(express.json());
 
@@ -40,31 +39,3 @@ app.listen(PORT, () => {
   console.log(`🚀 Backend rodando na porta ${PORT}`);
 });
 
-// import dotenv from "dotenv";
-// dotenv.config();
-
-// import express from "express";
-// import cors from "cors";
-// import router from "./e.routes/index.js";
-
-// const app = express();
-
-// app.use(cors({
-//   origin: true,
-//   credentials: true,
-//   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-//   allowedHeaders: ["Content-Type", "Authorization"],
-// }));
-
-// app.use(express.json({ limit: "50mb" }));
-// app.use(express.urlencoded({ extended: true, limit: "50mb" }));
-
-// app.use(router);
-
-// const PORT = process.env.PORT || 4000;
-
-// app.listen(PORT, "0.0.0.0", () => {
-//   console.log(`🚀 Backend rodando na porta ${PORT}`);
-// });
-
-// export default app;
