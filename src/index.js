@@ -39,7 +39,6 @@
 //   console.log(`🚀 Backend rodando na porta ${PORT}`);
 // });
 
-// export default app;
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -49,9 +48,6 @@ import router from "./e.routes/index.js";
 
 const app = express();
 
-/**
- * CORS GLOBAL — vem PRIMEIRO
- */
 app.use(cors({
   origin: true,
   credentials: true,
@@ -59,18 +55,9 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
 
-// Preflight explícito
-app.options("*", cors());
-
-/**
- * Body parsers
- */
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
-/**
- * Rotas (DEPOIS do CORS)
- */
 app.use(router);
 
 const PORT = process.env.PORT || 4000;
