@@ -1,43 +1,69 @@
 import dotenv from "dotenv";
 dotenv.config({ path: "../.env" });
 
-
-console.log("SUPABASE_URL =>", process.env.SUPABASE_URL);
-
 import express from "express";
 import cors from "cors";
 import router from "./e.routes/index.js";
 
+console.log("SUPABASE_URL =>", process.env.SUPABASE_URL);
+
 const app = express();
 
+/**
+ * =====================================================
+ * 🌍 ORIGENS PERMITIDAS
+ * =====================================================
+ */
 const allowedOrigins = [
   "https://d3n78ekyg3zlc1.cloudfront.net",
   "http://localhost:5173",
 ];
 
-app.use(cors({
-  origin: function (origin, callback) {
-    // permite chamadas sem origin (Postman, curl)
-    if (!origin) return callback(null, true);
+/**
+ * =====================================================
+ * 🔐 CORS (COMPATÍVEL COM EXPRESS 5)
+ * =====================================================
+ */
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
+/**
+ * =====================================================
+ * 📦 BODY PARSER
+ * =====================================================
+ */
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true }));
 
-    return callback(new Error("Not allowed by CORS"));
-  },
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-}));
+/**
+ * =====================================================
+ * 🚦 HEALTH CHECK
+ * =====================================================
+ */
+app.get("/health", (_, res) => {
+  res.status(200).json({ status: "ok" });
+});
 
-
-app.use(express.json());
-
-// Rotas
+/**
+ * =====================================================
+ * 🚏 ROTAS
+ * =====================================================
+ */
 app.use(router);
 
+/**
+ * =====================================================
+ * 🚀 START SERVER
+ * =====================================================
+ */
 const PORT = process.env.PORT || 4000;
+
 app.listen(PORT, () => {
   console.log(`🚀 Backend rodando na porta ${PORT}`);
 });
-
