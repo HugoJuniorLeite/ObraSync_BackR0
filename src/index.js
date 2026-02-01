@@ -40,8 +40,6 @@
 // });
 
 // export default app;
-
-
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -51,11 +49,9 @@ import router from "./e.routes/index.js";
 
 const app = express();
 
-const allowedOrigins = [
-  "https://d3n78ekyg3zlc1.cloudfront.net",
-  "http://localhost:5173",
-];
-
+/**
+ * CORS GLOBAL — vem PRIMEIRO
+ */
 app.use(cors({
   origin: true,
   credentials: true,
@@ -63,12 +59,18 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
 
+// Preflight explícito
 app.options("*", cors());
 
-
+/**
+ * Body parsers
+ */
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
+/**
+ * Rotas (DEPOIS do CORS)
+ */
 app.use(router);
 
 const PORT = process.env.PORT || 4000;
