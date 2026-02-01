@@ -1,4 +1,6 @@
-import "dotenv/config";
+import dotenv from "dotenv";
+dotenv.config({ path: "../.env" });
+
 
 console.log("SUPABASE_URL =>", process.env.SUPABASE_URL);
 
