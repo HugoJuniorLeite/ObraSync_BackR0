@@ -36,7 +36,7 @@ app.use(router);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
-  console.log(`🚀 Backend rodando na porta ${PORT}`);
+  console.log(`🚀 Backend rodando na porta ${PORT}5`);
 });
 
 // import dotenv from "dotenv";
