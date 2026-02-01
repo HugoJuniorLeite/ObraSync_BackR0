@@ -11,105 +11,105 @@ import os from "os";
 
 
 
-// =====================================================
-// MULTER DISK (NÃO USA MEMÓRIA)
-// =====================================================
+// // =====================================================
+// // MULTER DISK (NÃO USA MEMÓRIA)
+// // =====================================================
 
-const storage = multer.diskStorage({
-  destination: os.tmpdir(),
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname);
-  },
-});
+// const storage = multer.diskStorage({
+//   destination: os.tmpdir(),
+//   filename: (req, file, cb) => {
+//     cb(null, Date.now() + "-" + file.originalname);
+//   },
+// });
 
-const upload = multer({
-  storage,
-  limits: { fileSize: 10 * 1024 * 1024 },
-});
+// const upload = multer({
+//   storage,
+//   limits: { fileSize: 10 * 1024 * 1024 },
+// });
 
-// =====================================================
-// MIDDLEWARE
-// =====================================================
+// // =====================================================
+// // MIDDLEWARE
+// // =====================================================
 
-export const upload_photos_middleware = upload.fields([
-  { name: "fotoCalcadaAntes" },
-  { name: "fotoFrenteImovel" },
-  { name: "fotoPlacaRua" },
-  { name: "fotoProtecaoMecanica" },
-  { name: "fotoProvisorio" },
-  { name: "fotoRamalCortado" },
-  { name: "fotoRamalExposto" },
-  { name: "fotoTachao" },
-  { name: "fotoCroqui" },
-]);
+// export const upload_photos_middleware = upload.fields([
+//   { name: "fotoCalcadaAntes" },
+//   { name: "fotoFrenteImovel" },
+//   { name: "fotoPlacaRua" },
+//   { name: "fotoProtecaoMecanica" },
+//   { name: "fotoProvisorio" },
+//   { name: "fotoRamalCortado" },
+//   { name: "fotoRamalExposto" },
+//   { name: "fotoTachao" },
+//   { name: "fotoCroqui" },
+// ]);
 
-// =====================================================
-// SUPABASE UPLOAD
-// =====================================================
-
-async function upload_photo_to_supabase(file) {
-  const buffer = fs.readFileSync(file.path);
-
-  const { data, error } = await supabase.storage
-    .from("photos")
-    .upload(`project/${Date.now()}_${file.originalname}`, buffer, {
-      contentType: file.mimetype,
-      upsert: false,
-    });
-
-  fs.unlinkSync(file.path);
-
-  if (error) throw error;
-
-  return supabase.storage.from("photos").getPublicUrl(data.path).data.publicUrl;
-}
-
-
-// const upload = multer({ storage: multer.memoryStorage() });
+// // =====================================================
+// // SUPABASE UPLOAD
+// // =====================================================
 
 // async function upload_photo_to_supabase(file) {
-//   // Faz upload
+//   const buffer = fs.readFileSync(file.path);
+
 //   const { data, error } = await supabase.storage
 //     .from("photos")
-//     .upload(`project/${Date.now()}_${file.originalname}`, file.buffer, {
+//     .upload(`project/${Date.now()}_${file.originalname}`, buffer, {
 //       contentType: file.mimetype,
-//       upsert: false, // evita sobrescrever
+//       upsert: false,
 //     });
 
-//   if (error) {
-//     console.error("Erro ao enviar arquivo:", error);
-//     throw error;
-//   }
+//   fs.unlinkSync(file.path);
 
-//   if (!data || !data.path) {
-//     throw new Error("Upload não retornou caminho do arquivo.");
-//   }
+//   if (error) throw error;
 
-//   // Gera URL pública
-//   const { data: publicData } = supabase.storage
-//     .from("photos")
-//     .getPublicUrl(data.path);
-
-//   if (!publicData || !publicData.publicUrl) {
-//     throw new Error("Não foi possível gerar a URL pública.");
-//   }
-
-//   return publicData.publicUrl;
+//   return supabase.storage.from("photos").getPublicUrl(data.path).data.publicUrl;
 // }
 
 
-// // Middleware para aceitar múltiplos arquivos
-// export const upload_photos_middleware = upload.fields([
-//     { name: "fotoCalcadaAntes" },
-//     { name: "fotoFrenteImovel" },
-//     { name: "fotoPlacaRua" },
-//     { name: "fotoProtecaoMecanica" },
-//     { name: "fotoProvisorio" },
-//     { name: "fotoRamalCortado" },
-//     { name: "fotoRamalExposto" },
-//     { name: "fotoTachao" },
-//     { name: "fotoCroqui" }, // opcional: croqui em foto
-// ]);
+const upload = multer({ storage: multer.memoryStorage() });
+
+async function upload_photo_to_supabase(file) {
+  // Faz upload
+  const { data, error } = await supabase.storage
+    .from("photos")
+    .upload(`project/${Date.now()}_${file.originalname}`, file.buffer, {
+      contentType: file.mimetype,
+      upsert: false, // evita sobrescrever
+    });
+
+  if (error) {
+    console.error("Erro ao enviar arquivo:", error);
+    throw error;
+  }
+
+  if (!data || !data.path) {
+    throw new Error("Upload não retornou caminho do arquivo.");
+  }
+
+  // Gera URL pública
+  const { data: publicData } = supabase.storage
+    .from("photos")
+    .getPublicUrl(data.path);
+
+  if (!publicData || !publicData.publicUrl) {
+    throw new Error("Não foi possível gerar a URL pública.");
+  }
+
+  return publicData.publicUrl;
+}
+
+
+// Middleware para aceitar múltiplos arquivos
+export const upload_photos_middleware = upload.fields([
+    { name: "fotoCalcadaAntes" },
+    { name: "fotoFrenteImovel" },
+    { name: "fotoPlacaRua" },
+    { name: "fotoProtecaoMecanica" },
+    { name: "fotoProvisorio" },
+    { name: "fotoRamalCortado" },
+    { name: "fotoRamalExposto" },
+    { name: "fotoTachao" },
+    { name: "fotoCroqui" }, // opcional: croqui em foto
+]);
 
 // Função para mapear croquis do RDO
 function map_street_data(data = {}) {
