@@ -1,43 +1,64 @@
 import rdo_service from "../b.services/rdo_service.js";
 import multer from "multer";
-import supabase from "../supabaseClient.js";
+// import supabase from "../supabaseClient.js";
 import PDFDocument from 'pdfkit';
 import fetch from "node-fetch";
 import path from "path";
 import { fileURLToPath } from "url";
 import axios from "axios"
 import fs from "fs";
+import {
+  PutObjectCommand,
+} from "@aws-sdk/client-s3";
+
+import s3 from "../config/s3Client.js";
+
 
 const upload = multer({ storage: multer.memoryStorage() });
 
-async function upload_photo_to_supabase(file) {
-  // Faz upload
-  const { data, error } = await supabase.storage
-    .from("photos")
-    .upload(`project/${Date.now()}_${file.originalname}`, file.buffer, {
-      contentType: file.mimetype,
-      upsert: false, // evita sobrescrever
-    });
+// async function upload_photo_to_supabase(file) {
+//   // Faz upload
+//   const { data, error } = await supabase.storage
+//     .from("photos")
+//     .upload(`project/${Date.now()}_${file.originalname}`, file.buffer, {
+//       contentType: file.mimetype,
+//       upsert: false, // evita sobrescrever
+//     });
 
-  if (error) {
-    console.error("Erro ao enviar arquivo:", error);
-    throw error;
-  }
+//   if (error) {
+//     console.error("Erro ao enviar arquivo:", error);
+//     throw error;
+//   }
 
-  if (!data || !data.path) {
-    throw new Error("Upload não retornou caminho do arquivo.");
-  }
+//   if (!data || !data.path) {
+//     throw new Error("Upload não retornou caminho do arquivo.");
+//   }
 
-  // Gera URL pública
-  const { data: publicData } = supabase.storage
-    .from("photos")
-    .getPublicUrl(data.path);
+//   // Gera URL pública
+//   const { data: publicData } = supabase.storage
+//     .from("photos")
+//     .getPublicUrl(data.path);
 
-  if (!publicData || !publicData.publicUrl) {
-    throw new Error("Não foi possível gerar a URL pública.");
-  }
+//   if (!publicData || !publicData.publicUrl) {
+//     throw new Error("Não foi possível gerar a URL pública.");
+//   }
 
-  return publicData.publicUrl;
+//   return publicData.publicUrl;
+// }
+
+async function upload_photo_to_s3(file) {
+  const key = `projeto/${Date.now()}_${file.originalname}`;
+
+  await s3.send(
+    new PutObjectCommand({
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key: key,
+      Body: file.buffer,
+      ContentType: file.mimetype,
+    })
+  );
+
+  return `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
 }
 
 
@@ -163,10 +184,15 @@ export async function create_rdo_controller(req, res) {
         const fotosUrls = {};
 
         // Upload de todas as fotos primeiro
+        // for (const fieldName in files) {
+        //     const file = files[fieldName][0]; // obrigatório [0]
+        //     fotosUrls[fieldName] = await upload_photo_to_supabase(file);
+        // }
+
         for (const fieldName in files) {
-            const file = files[fieldName][0]; // obrigatório [0]
-            fotosUrls[fieldName] = await upload_photo_to_supabase(file);
-        }
+  const file = files[fieldName][0];
+  fotosUrls[fieldName] = await upload_photo_to_s3(file);
+}
 
         // Mapear campos do body
         const mapped_body = map_fields_to_english(body, fotosUrls);

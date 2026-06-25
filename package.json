@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/HugoJuniorLeite/obra_sync_backend#readme",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1075.0",
     "@prisma/client": "^6.13.0",
     "@supabase/supabase-js": "^2.56.1",
     "adm-zip": "^0.5.16",
