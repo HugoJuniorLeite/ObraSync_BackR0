@@ -46,19 +46,64 @@ const upload = multer({ storage: multer.memoryStorage() });
 //   return publicData.publicUrl;
 // }
 
+// async function upload_photo_to_s3(file) {
+  
+//   const key = `projeto/${Date.now()}_${file.originalname}`;
+
+//   await s3.send(
+//     new PutObjectCommand({
+//       Bucket: process.env.AWS_BUCKET_NAME,
+//       Key: key,
+//       Body: file.buffer,
+//       ContentType: file.mimetype,
+//     })
+//   );
+
+//   return `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+// }
+
 async function upload_photo_to_s3(file) {
+
+  console.log("=================================");
+  console.log("Entrou no upload");
+  console.log("Arquivo:", file.originalname);
+  console.log("Tipo:", file.mimetype);
+  console.log("Tamanho:", file.size);
+
   const key = `projeto/${Date.now()}_${file.originalname}`;
 
-  await s3.send(
-    new PutObjectCommand({
+  console.log("Key:", key);
+
+  try {
+
+    console.log("Criando PutObjectCommand...");
+
+    const command = new PutObjectCommand({
       Bucket: process.env.AWS_BUCKET_NAME,
       Key: key,
       Body: file.buffer,
       ContentType: file.mimetype,
-    })
-  );
+    });
 
-  return `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+    console.log("Enviando para AWS...");
+
+    const result = await s3.send(command);
+
+    console.log("Upload realizado!");
+    console.log(result);
+
+    return `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+
+  } catch (err) {
+
+    console.error("ERRO AWS");
+    console.error(err);
+    console.error(err.name);
+    console.error(err.message);
+    console.error(err.stack);
+
+    throw err;
+  }
 }
 
 
@@ -190,8 +235,14 @@ export async function create_rdo_controller(req, res) {
         // }
 
         for (const fieldName in files) {
+
+           console.log("--------------------------------");
+    console.log("Campo:", fieldName);
+
   const file = files[fieldName][0];
   fotosUrls[fieldName] = await upload_photo_to_s3(file);
+
+   console.log("Finalizou:", fieldName);
 }
 
         // Mapear campos do body
