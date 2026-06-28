@@ -290,6 +290,12 @@ export async function generate_rdo_pdf_controller(req, res) {
 });
     // const doc = new PDFDocument({ margin: 50, size: "A4" });
 const rdoData = await rdo_service.get_rdo_by_bill_id_service(bill_id);
+
+
+console.log(Array.isArray(rdoData.photos));
+console.log(typeof rdoData.photos);
+console.dir(rdoData.photos, { depth: null });
+
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", `attachment; filename=RDO_${bill_id}.pdf`);
     doc.pipe(res);
