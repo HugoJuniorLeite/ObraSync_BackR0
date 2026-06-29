@@ -22,23 +22,6 @@ import {
 
 
 
-async function getImageBuffer(url) {
-
-  const key = decodeURIComponent(
-    new URL(url).pathname.substring(1)
-  );
-
-  const command = new GetObjectCommand({
-    Bucket: process.env.AWS_BUCKET_NAME,
-    Key: key,
-  });
-
-  const response = await s3.send(command);
-
-  return Buffer.from(
-    await response.Body.transformToByteArray()
-  );
-}
 
 
 const upload = multer({ storage: multer.memoryStorage() });
@@ -1773,6 +1756,26 @@ export async function generate_rdo_pdf_controller(req, res) {
 
 
 
+async function getImageBuffer(url) {
+
+  const key = decodeURIComponent(
+    new URL(url).pathname.substring(1)
+  );
+
+  const command = new GetObjectCommand({
+    Bucket: process.env.AWS_BUCKET_NAME,
+    Key: key,
+  });
+
+  const response = await s3.send(command);
+
+  return Buffer.from(
+    await response.Body.transformToByteArray()
+  );
+}
+
+
+
         // Renderizar fotos em grid profissional
         async function renderPhotosProfessional(doc, rdoData) {
           if (!rdoData.photos || rdoData.photos.length === 0) return;
@@ -1808,39 +1811,87 @@ export async function generate_rdo_pdf_controller(req, res) {
                 y = 50;
               }
 
+              // try {
+              //   // const res = await fetch(url);
+              //   // const buffer = await res.arrayBuffer();
+              //   // const imageBuffer = Buffer.from(buffer);
+
+
+              //   const imageBuffer = await getImageBuffer(url);
+              //   doc.image(imageBuffer, x, y, {
+              //     width: photoWidth,
+              //     height: photoHeight,
+              //   });
+
+              //   // Desenhar borda e sombra leve
+              //   doc.save();
+              //   doc.rect(colX[xIndex] - borderPadding, y - borderPadding, photoWidth + 2 * borderPadding, photoHeight + 2 * borderPadding)
+              //     .lineWidth(0.5)
+              //     .strokeColor("#333333")
+              //     .stroke();
+              //   doc.restore();
+
+              //   doc.image(imageBuffer, colX[xIndex], y, { width: photoWidth, height: photoHeight });
+
+              //   // Legenda
+              //   doc.fontSize(10)
+              //     .fillColor("black")
+              //     .text(photoLabels[key], colX[xIndex], y + photoHeight + 5);
+
+              
+
+              // } catch (err) {
+              //   console.error("Erro ao carregar imagem:", url, err);
+              //   doc.fontSize(10)
+              //     .fillColor("red")
+              //     .text(`Erro ao carregar: ${photoLabels[key]}`, colX[xIndex], y + photoHeight / 2);
+              // }
+
               try {
-                // const res = await fetch(url);
-                // const buffer = await res.arrayBuffer();
-                // const imageBuffer = Buffer.from(buffer);
 
+    const imageBuffer = await getImageBuffer(url);
 
-                const imageBuffer = await getImageBuffer(url);
-                doc.image(imageBuffer, x, y, {
-                  width: photoWidth,
-                  height: photoHeight,
-                });
+    // Borda
+    doc.save();
+    doc.rect(
+        colX[xIndex] - borderPadding,
+        y - borderPadding,
+        photoWidth + borderPadding * 2,
+        photoHeight + borderPadding * 2
+    )
+    .lineWidth(0.5)
+    .strokeColor("#333333")
+    .stroke();
+    doc.restore();
 
-                // Desenhar borda e sombra leve
-                doc.save();
-                doc.rect(colX[xIndex] - borderPadding, y - borderPadding, photoWidth + 2 * borderPadding, photoHeight + 2 * borderPadding)
-                  .lineWidth(0.5)
-                  .strokeColor("#333333")
-                  .stroke();
-                doc.restore();
+    // Imagem
+    doc.image(imageBuffer, colX[xIndex], y, {
+        width: photoWidth,
+        height: photoHeight
+    });
 
-                doc.image(imageBuffer, colX[xIndex], y, { width: photoWidth, height: photoHeight });
+    // Legenda
+    doc
+        .fontSize(10)
+        .fillColor("black")
+        .text(
+            photoLabels[key],
+            colX[xIndex],
+            y + photoHeight + 5
+        );
 
-                // Legenda
-                doc.fontSize(10)
-                  .fillColor("black")
-                  .text(photoLabels[key], colX[xIndex], y + photoHeight + 5);
+} catch (err) {
+    console.error("Erro ao carregar imagem:", url, err);
 
-              } catch (err) {
-                console.error("Erro ao carregar imagem:", url, err);
-                doc.fontSize(10)
-                  .fillColor("red")
-                  .text(`Erro ao carregar: ${photoLabels[key]}`, colX[xIndex], y + photoHeight / 2);
-              }
+    doc
+        .fontSize(10)
+        .fillColor("red")
+        .text(
+            `Erro ao carregar: ${photoLabels[key]}`,
+            colX[xIndex],
+            y + photoHeight / 2
+        );
+}
 
               xIndex++;
               if (xIndex >= colX.length) {
