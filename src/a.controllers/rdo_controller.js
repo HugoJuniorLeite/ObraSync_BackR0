@@ -8,17 +8,12 @@ import { fileURLToPath } from "url";
 import axios from "axios"
 import fs from "fs";
 import {
+  S3Client,
   PutObjectCommand,
+  GetObjectCommand,
 } from "@aws-sdk/client-s3";
 
 import s3 from "../config/s3Client.js";
-
-import {
-  GetObjectCommand,
-  PutObjectCommand
-} from "@aws-sdk/client-s3";
-
-
 
 
 
